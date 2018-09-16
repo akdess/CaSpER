@@ -10,7 +10,7 @@ License:
 Encoding: UTF-8
 LazyData: true
 LinkingTo: Rcpp
-Depends: Rcpp, signal, pheatmap, RColorBrewer, HMMcopy, IRanges, grid, GenomeGraphs, ggplot2, reshape, mclust,  ggpubr, scales, gridExtra, igraph, intergraph, ggnetwork 
+Depends: Rcpp, signal, pheatmap, RColorBrewer, HMMcopy, IRanges, grid, GenomeGraphs, ggplot2, reshape, mclust,  ggpubr, scales, gridExtra, igraph, intergraph, ggnetwork, philentropy, ape
 RoxygenNote: 6.0.1
 Suggests: knitr,
     rmarkdown

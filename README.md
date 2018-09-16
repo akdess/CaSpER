@@ -51,7 +51,7 @@ Usage
 Step 1. Merge single cell RNA-Seq bam files (required for single-cell studies)
 
 ```{bash} 
-	 /home1/05227/akdes/bin/bamtools merge -list <bam_file_names> -out <sample_name>_merged.bam 
+	 bamtools merge -list <bam_file_names> -out <sample_name>_merged.bam 
 	 samtools index <sample_name>_merged.bam
 ```
 
@@ -88,18 +88,12 @@ for hg19:
 	fetchChromSizes hg19 > hg19.list
 ```
 
-Merge single cell bam files:
-```{bash} 
-	 /home1/05227/akdes/bin/bamtools merge -list <bam_file_names> -out <sample_name>_merged.bam 
-	 samtools index <sample_name>_merged.bam
-```
-
 Step 3. Run CaSpER R package (See tutorials below)
 
 
 Tutorials
 ----------
 
-1. [Yale meningioma Bulk RNA-Seq dataset](Meningioma.md)
-2. [TCGA-GBM Bulk RNA-Seq dataset](TCGA_GBM.md)
-3. [GBM Single-cell RNA-Seq dataset](sCell_GBM.md)
+1. [Yale meningioma Bulk RNA-Seq dataset](Meningioma.md) ([R demo code](/R/meningioma.R))
+2. [TCGA-GBM Bulk RNA-Seq dataset](TCGA_GBM.md)([R demo code](/R/tcga_GBM.R))
+3. [GBM Single-cell RNA-Seq dataset](sCell_GBM.md)([R demo code](/R/sCellGBM.R))

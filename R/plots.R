@@ -470,54 +470,24 @@ plotMUAndCooccurence <- function(results)
 
 plotSCellCNVTree <- function(finalChrMat, sampleName, path="C:\\Users\\aharmanci\\Downloads\\phylip-3.695\\phylip-3.695\\exe", fileName)
  {
-#     #library(philentropy)
-#     library(Rphylip)
-#     library(phyloseq)
-
-#     finalChrMat<- finalChrMat[grep(sampleName, rownames(finalChrMat)),]
-#     chr <- names(which(apply(finalChrMat, 2, function(x) length(which(x!=0)))/nrow(finalChrMat)>0.1))
-#     finalChrMat <- finalChrMat[, match(chr, colnames(finalChrMat))]
+    finalChrMat<- finalChrMat[grep(sampleName, rownames(finalChrMat)),]
+    chr <- names(which(apply(finalChrMat, 2, function(x) length(which(x!=0)))/nrow(finalChrMat)>0.1))
+    finalChrMat <- finalChrMat[, match(chr, colnames(finalChrMat))]
     
-#     m<- distance(finalChrMat, method = "jaccard")
-#     colnames(m) <- rownames(finalChrMat)
-#     rownames(m) <- rownames(finalChrMat)
-#     tree<-Rfitch(na.omit(m), global=F, path=path, outgroup=T)
+    m<- distance(finalChrMat, method = "jaccard")
+    colnames(m) <- rownames(finalChrMat)
+    rownames(m) <- rownames(finalChrMat)
+    tree<-Rfitch(na.omit(m), global=T, path=path, outgroup=T)
 
 
-#     pdf(fileName)
-#     X <- as.matrix(finalChrMat)[,which(apply(finalChrMat, 2, sum)!=0)]
-#     plot(tree, x.lim = 40, align.tip = TRUE, adj = 1, cex=0.2)
-#     f <- function(n) c(muted("blue"), "white",muted("red"))
-#     phydataplot(X, tree, "m", 2, width = 2, border = "white", lwd = 2,
-#                 legend = "side", funcol = f)
-#     dev.off()
 
-    
-#     del <- data.frame(apply(finalChrMat, 1, function(x) paste(names(which(x==(-1))), collapse="del,")))
-
-#     amp <- data.frame(apply(finalChrMat, 1, function(x) paste(names(which(x==(1))), collapse="amp,")))
-
-#     all <- paste0(del[,1], "del,", amp[,1], "amp")
-#     all[which(all=="del,amp")] <- ""
-#     all <- gsub(",amp", "", all)
-#     all <- gsub("^del,", "", all)
-
-#     data(GlobalPatterns)
-#      physeq = prune_taxa(taxa_names(GlobalPatterns)[1:50], GlobalPatterns)
-#     finalChrMat[finalChrMat==(-1)] <- 2
-#      physeq@phy_tree <- tree
-
-#     physeq@otu_table@.Data <- finalChrMat
-#     physeq@tax_table <- NULL
-#       physeq@sam_data <-  physeq@sam_data[1:length(colnames(finalChrMat)), ]
-#      physeq@sam_data$X.SampleID <- colnames(finalChrMat)
-#      physeq@sam_data$SampleType <- colnames(finalChrMat)
-#      #physeq@sam_data$SampleType[!physeq@sam_data$SampleType %in% c("5q", "14q")] <- "others"
-#       physeq = prune_taxa(taxa_names(physeq), physeq)
-#       h <- plot_tree(physeq, ladderize="left", color="SampleType") +  scale_fill_brewer(palette="Spectral")
-#      rownames(physeq@sam_data)  <- colnames(finalChrMat)
-
-#     plot_tree(physeq)
+    pdf(fileName)
+    X <- as.matrix(finalChrMat)[,which(apply(finalChrMat, 2, sum)!=0)]
+    plot(tree, x.lim = 40, align.tip = TRUE, adj = 1, cex=0.2)
+    f <- function(n) c(muted("blue"), "white",muted("red"))
+    phydataplot(X, tree, "m", 2, width = 2, border = "white", lwd = 2,
+                legend = "side", funcol = f)
+    dev.off()
 
 
 }

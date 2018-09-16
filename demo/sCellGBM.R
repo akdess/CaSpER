@@ -40,3 +40,5 @@ plotSingleCellLargeScaleEventHeatmap(finalChrMat, sampleName="MGH31", chrs=c("5p
 results <- extractMUAndCooccurence (finalChrMat, loh, loh.name.mapping)
 ## visualize mutual exclusive and co-occurent events
 plotMUAndCooccurence (results)
+## visualize CNV pyhlogenetic tree 
+plotSCellCNVTree (finalChrMat, sampleName="MGH31", path="C:\\Users\\aharmanci\\Downloads\\phylip-3.695\\phylip-3.695\\exe", fileName="CNVTree.pdf")
