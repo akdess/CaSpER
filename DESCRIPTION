@@ -1,0 +1,17 @@
+Package: CaSpER
+Type: Package
+Title: Identify large-scale CNV events from single cell or bulk RNA-Seq data
+Version: 0.1.0
+Author: Akdes Serin Harmanci, Arif O. Harmanci
+Maintainer: Akdes Serin Harmanci <akdess@gmail.com> 
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: 
+Encoding: UTF-8
+LazyData: true
+LinkingTo: Rcpp
+Depends: Rcpp, signal, pheatmap, RColorBrewer, HMMcopy, IRanges, grid, GenomeGraphs, ggplot2, reshape, mclust,  ggpubr, scales, gridExtra, igraph, intergraph, ggnetwork 
+RoxygenNote: 6.0.1
+Suggests: knitr,
+    rmarkdown
+VignetteBuilder: knitr
