@@ -1,6 +1,4 @@
----
-title: "CaSpER"
-output: github_document
+CaSpER
 ---
 
 CaSpER is an algorithm for identification, visualization and integrative analysis of CNV events in multiscale resolution using single-cell or bulk RNA sequencing data.
