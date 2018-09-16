@@ -94,6 +94,6 @@ Step 3. Run CaSpER R package (See tutorials below)
 Tutorials
 ----------
 
-1. [Yale meningioma Bulk RNA-Seq dataset](Meningioma.md) ([R demo code](/R/meningioma.R))
-2. [TCGA-GBM Bulk RNA-Seq dataset](TCGA_GBM.md)([R demo code](/R/tcga_GBM.R))
-3. [GBM Single-cell RNA-Seq dataset](sCell_GBM.md)([R demo code](/R/sCellGBM.R))
+1. [Yale meningioma Bulk RNA-Seq dataset](Meningioma.md) ([R demo code](/demo/meningioma.R))
+2. [TCGA-GBM Bulk RNA-Seq dataset](TCGA_GBM.md)([R demo code](/demo/tcga_GBM.R))
+3. [GBM Single-cell RNA-Seq dataset](sCell_GBM.md)([R demo code](/demo/sCellGBM.R))
