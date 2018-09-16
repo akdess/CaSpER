@@ -56,7 +56,7 @@ Step 1. Merge single cell RNA-Seq bam files (required for single-cell studies)
 Step 2. Extract BAF values from RNA-Seq bam files
 	
 ```{bash}
-	samtools view <bam_file> | ./BAFExtract -generate_compressed_pileup_per_SAM stdin <genome_list> <sample_dir> 50 0; ./mapped_read_tools -get_SNVs_per_pileup  <genome_list> <output_dir> <genome_fasta_pileup_dir> 20 4 0.1 <output_file>
+	samtools view <bam_file> | ./BAFExtract -generate_compressed_pileup_per_SAM stdin <genome_list> <sample_dir> 50 0; ./BAFExtract -get_SNVs_per_pileup  <genome_list> <sample_dir> <genome_fasta_pileup_dir> 20 4 0.1 <output_baf_file>
 ```
 
 To generate genome_fasta_pileup_dir: 
@@ -69,7 +69,7 @@ for hg38:
 for hg19: 
 ```{bash}
 		wget -c http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz; tar -xvzf hg38.chromFa.tar.gz
-		cd <genome_fasta_dir>; genome_sequence_tools -binarize_fasta_per_dir . . fa
+		cd <genome_fasta_pileup_dir>; genome_sequence_tools -binarize_fasta_per_dir . . fa
 ```
 	
 To generate genome_list file: 
@@ -92,6 +92,6 @@ Step 3. Run CaSpER R package (See tutorials below)
 Tutorials
 ----------
 
-1. [Yale meningioma Bulk RNA-Seq dataset](Meningioma.md) ([R demo code](/demo/meningioma.R))
-2. [TCGA-GBM Bulk RNA-Seq dataset](TCGA_GBM.md)([R demo code](/demo/tcga_GBM.R))
-3. [GBM Single-cell RNA-Seq dataset](sCell_GBM.md)([R demo code](/demo/sCellGBM.R))
+1. [Yale meningioma Bulk RNA-Seq dataset](/demo/meningioma.R)
+2. [TCGA-GBM Bulk RNA-Seq dataset](/demo/tcga_GBM.R)
+3. [GBM Single-cell RNA-Seq dataset](/demo/sCellGBM.R)
