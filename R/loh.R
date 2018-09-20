@@ -8,8 +8,8 @@ readBAFExtractOutput <- function(path, sequencing.type = "bulk") {
     loh <- list()
     for (i in 1:length(files)) {
         maf <- read.table(file.path(path, files[i]), header = F, stringsAsFactor = F)
-        maf <- data.frame(chr = maf[, 1], position = maf[, 2], alt = maf[, 5], ref = maf[, 6] - maf[, 5], coverage = maf[, 6], baf = maf[, 5]/maf[, 
-            6], dev = abs(as.numeric(maf[, 5]/maf[, 6]) - 0.5))
+        maf <- data.frame(chr = maf[, 1], position = maf[, 2], alt = maf[, 5], ref = maf[, 6] - maf[, 5], coverage = maf[, 
+            6], baf = maf[, 5]/maf[, 6], dev = abs(as.numeric(maf[, 5]/maf[, 6]) - 0.5))
         maf <- maf[order(maf$position), ]
         idx = unlist(as.vector((sapply(1:22, function(x) as.vector(unlist(which(as.character(maf$chr) == x)))))))
         maf <- maf[idx, ]
@@ -72,7 +72,8 @@ lohCallMedianFilterByChr <- function(object, loh.scale, n = 50, scale.iteration 
             }
             
             maf_temp <- maf_2
-            # plot_LOH_WG_Unpaired (maf=maf_2,sample_name=paste0(sample_name, 'before_smooth_center', '_', i), outDir=paste0('./', fileName))
+            # plot_LOH_WG_Unpaired (maf=maf_2,sample_name=paste0(sample_name, 'before_smooth_center', '_', i), outDir=paste0('./',
+            # fileName))
             n <- n + scale.iteration
         }
         object@loh.median.filtered.data[[j]] <- maf_2

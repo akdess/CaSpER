@@ -18,38 +18,9 @@ load("tcga_gbm_data.rda")
 load("hg19_cytoband.rda")
 
 ## generate annotation data.frame
-mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart="ensembl",GRCh=37))
-genes <-  rownames(data)
-G_list <- getBM(filters= "hgnc_symbol", attributes= c("hgnc_symbol",'chromosome_name', 'start_position', 'end_position', 'strand'), values=genes, mart= mart)
-common <- intersect(rownames(data), G_list$hgnc_symbol)
-ord <- match(common, G_list$hgnc_symbol)
-annotation <- G_list[ord, ]
-annotation <- annotation[order(annotation$start_position), ]
-chr.list =as.character(1:22, "X")
-idx = unlist(as.vector((sapply(chr.list,function(x) as.vector(unlist(which(as.character(annotation$chromosome_name)==x)))))))
-annotation<-as.data.frame(annotation[idx,])
-data <- data[match( annotation$hgnc_symbol,rownames(data)), ]
 
-colnames(annotation)[1:4] <- c("Gene", "Chr", "start", "end")
-annotation$isCentromer <- rep("no", nrow(annotation))
-
-centromere_snps<-NULL
-for (k in 1:(dim(centromere)[1]))
-{
-  annotation$isCentromer[which(as.character(annotation$Chr)==gsub("chr","",as.character(centromere$V1[k])) & 
-                                             (as.numeric(as.character(annotation$Position))>=centromere$V2[k] & as.numeric(as.character(coord$Position))<=centromere$V3[k]))] <- "yes"
-}
-
-annotation$Position <- (as.numeric(annotation$start) + as.numeric(annotation$end))/2
-annotation$cytoband<-rep("", nrow(annotation))
-
-for (k in 1:(dim(annotation)[1]))
-{
-	annotation$cytoband[which(as.character(annotation$Chr)==gsub("chr","",as.character(cytoband$V1[k])) & 
-		(as.numeric(as.character(annotation$Position))>=cytoband$V2[k] & as.numeric(as.character(annotation$Position))<=cytoband$V3[k]))] <-paste(as.character(cytoband$V1[k]),as.character(cytoband$V4[k]),sep="")
-}
-
-annotation$new_positions <- as.vector(unlist(lapply(lapply(split(annotation$cytoband,   annotation$cytoband), length)[unique(annotation$cytoband)], function(x) 1:x)))
+annotation <- generateAnnotation(id_type="hgnc_symbol", genes=rownames(data), ishg19=T, centromere)
+data <- data[match( annotation$Gene,rownames(data)), ]
 
 ## create CaSpER object 
 

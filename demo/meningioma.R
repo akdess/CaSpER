@@ -17,39 +17,9 @@ load("yale_meningioma_data.rda")
 load("hg19_cytoband.rda")
 
 ## generate annotation data.frame
-mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart="ensembl",GRCh=37))
-genes <-  rownames(data)
-G_list <- getBM(filters= "ensembl_gene_id", attributes= c("ensembl_gene_id","hgnc_symbol",'chromosome_name', 'start_position', 'end_position', 'strand'), values=genes, mart= mart)
-common <- intersect(rownames(data), G_list$ensembl_gene_id)
-ord <- match(common, G_list$ensembl_gene_id)
-annotation <- G_list[ord, ]
-annotation <- annotation[order(annotation$start_position), ]
-chr.list =as.character(1:22, "X")
-idx = unlist(as.vector((sapply(chr.list,function(x) as.vector(unlist(which(as.character(annotation$chromosome_name)==x)))))))
-annotation<-as.data.frame(annotation[idx,])
-data <- data[match( annotation$ensembl_gene_id,rownames(data)), ]
-
-colnames(annotation)[1:4] <- c("Gene", "Chr", "start", "end")
-annotation$isCentromer <- rep("no", nrow(annotation))
-
-centromere_snps<-NULL
-for (k in 1:(dim(centromere)[1]))
-{
-  annotation$isCentromer[which(as.character(annotation$Chr)==gsub("chr","",as.character(centromere$V1[k])) & 
-                                             (as.numeric(as.character(annotation$Position))>=centromere$V2[k] & as.numeric(as.character(coord$Position))<=centromere$V3[k]))] <- "yes"
-}
-
-annotation$Position <- (as.numeric(annotation$start) + as.numeric(annotation$end))/2
-annotation$cytoband<-rep("", nrow(annotation))
-
-for (k in 1:(dim(annotation)[1]))
-{
-	annotation$cytoband[which(as.character(annotation$Chr)==gsub("chr","",as.character(cytoband$V1[k])) & 
-		(as.numeric(as.character(annotation$Position))>=cytoband$V2[k] & as.numeric(as.character(annotation$Position))<=cytoband$V3[k]))] <-paste(as.character(cytoband$V1[k]),as.character(cytoband$V4[k]),sep="")
-}
-
-annotation$new_positions <- as.vector(unlist(lapply(lapply(split(annotation$cytoband,   annotation$cytoband), length)[unique(annotation$cytoband)], function(x) 1:x)))
-
+#curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz" | gunzip -c | grep acen | head
+annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(data), ishg19=T, centromere)
+data <- data[match( annotation$Gene,rownames(data)), ]
 
 ## read BAF extract output 
 loh <- readBAFExtractOutput ( path="./meningioma_baf\\", sequencing.type="bulk")

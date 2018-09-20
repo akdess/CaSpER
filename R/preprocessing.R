@@ -47,14 +47,16 @@
 #' pbmc_small <- CreateCasperObject(raw.data = pbmc_raw)
 #' pbmc_small
 #'
-CreateCasperObject <- function(raw.data, annotation, control.sample.ids, cytoband, loh.name.mapping, cnv.scale, loh.scale, method, loh, project = "casperProject", 
-    sequencing.type, expr.cutoff = 4.5, display.progress = TRUE, log.transformed = TRUE, centered.threshold = 3, window.length = 50, length.iterations = 50, 
-    vis.bound = 2, noise.thr = 0.3, genomeVersion = "hg19", ...) {
+CreateCasperObject <- function(raw.data, annotation, control.sample.ids, cytoband, loh.name.mapping, cnv.scale, loh.scale, 
+    method, loh, project = "casperProject", sequencing.type, expr.cutoff = 4.5, display.progress = TRUE, log.transformed = TRUE, 
+    centered.threshold = 3, window.length = 50, length.iterations = 50, vis.bound = 2, noise.thr = 0.3, genomeVersion = "hg19", 
+    ...) {
     
     casper.version <- packageVersion("casper")
-    object <- new(Class = "casper", raw.data = raw.data, loh = loh, annotation = annotation, sequencing.type = sequencing.type, control.sample.ids = control.sample.ids, 
-        project.name = project, version = casper.version, cytoband = cytoband, loh.name.mapping = loh.name.mapping, cnv.scale = cnv.scale, loh.scale = loh.scale, 
-        method = method, window.length = window.length, length.iterations = length.iterations, vis.bound = vis.bound, noise.thr = noise.thr, genomeVersion = genomeVersion)
+    object <- new(Class = "casper", raw.data = raw.data, loh = loh, annotation = annotation, sequencing.type = sequencing.type, 
+        control.sample.ids = control.sample.ids, project.name = project, version = casper.version, cytoband = cytoband, loh.name.mapping = loh.name.mapping, 
+        cnv.scale = cnv.scale, loh.scale = loh.scale, method = method, window.length = window.length, length.iterations = length.iterations, 
+        vis.bound = vis.bound, noise.thr = noise.thr, genomeVersion = genomeVersion)
     # filter cells on number of genes detected modifies the raw.data slot as well now
     if (!log.transformed) {
         object@raw.data <- log2(object@raw.data + 1)
@@ -85,7 +87,8 @@ processMedianFiltering <- function(object) {
     object <- CenterSmooth(object)
     
     object <- ControlNormalize(object, vis.bound = object@vis.bound, noise.thr = object@noise.thr)
-    # parameters.to.store <- as.list(x = environment(), all = TRUE)[names(formals('CreateCasperObject'))] parameters.to.store$raw.data <- NULL
+    # parameters.to.store <- as.list(x = environment(), all = TRUE)[names(formals('CreateCasperObject'))]
+    # parameters.to.store$raw.data <- NULL
     return(object)
 }
 
@@ -116,12 +119,13 @@ PerformMedianFilter <- function(object, window.length = 50, length.iterations = 
     
     for (i in 1:object@cnv.scale) {
         if (i == 1) {
-            median.filtered.data[[i]] <- apply(object@centered.data, 2, function(x) round(filter(MedianFilter(window.length + 1), x), digits = 2))
+            median.filtered.data[[i]] <- apply(object@centered.data, 2, function(x) round(filter(MedianFilter(window.length + 
+                1), x), digits = 2))
             rownames(median.filtered.data[[i]]) <- rownames(object@centered.data)
             window.length <- window.length + length.iterations
         } else {
-            median.filtered.data[[i]] <- apply(median.filtered.data[[i - 1]], 2, function(x) round(filter(MedianFilter(window.length + 1), x), 
-                digits = 2))
+            median.filtered.data[[i]] <- apply(median.filtered.data[[i - 1]], 2, function(x) round(filter(MedianFilter(window.length + 
+                1), x), digits = 2))
             rownames(median.filtered.data[[i]]) <- rownames(object@centered.data)
             window.length <- window.length + length.iterations
         }

@@ -3,9 +3,9 @@
 #' 
 #' 
 generateParam <- function(object, scale = 4) {
-    param <- data.frame(strength = 1e+07, e = 0.9999999, mu = quantile(object@control.normalized[[scale]], na.rm = TRUE, prob = c(0.01, 0.05, 
-        0.5, 0.95, 0.99)), lambda = 20, nu = 2.1, kappa = c(0.05, 0.05, 0.8, 0.05, 0.05) * 1000, m = 0, eta = c(5, 5, 50, 5, 5) * 10000, gamma = 3, 
-        S = 0)
+    param <- data.frame(strength = 1e+07, e = 0.9999999, mu = quantile(object@control.normalized[[scale]], na.rm = TRUE, prob = c(0.01, 
+        0.05, 0.5, 0.95, 0.99)), lambda = 20, nu = 2.1, kappa = c(0.05, 0.05, 0.8, 0.05, 0.05) * 1000, m = 0, eta = c(5, 5, 
+        50, 5, 5) * 10000, gamma = 3, S = 0)
     param$m <- param$mu
     param$S <- ((sd(2^object@control.normalized[[scale]], na.rm = TRUE)/sqrt(nrow(param)))^2)
     rownames(param) <- seq(1, 5)
@@ -91,17 +91,17 @@ mergeScalesAndGenerateFinalEventSummary <- function(final.objects) {
         
         for (x in 1:nrow((mergeScalesDel))) {
             
-            chrWithEvents <- as.vector(unlist(strsplit(as.vector(paste(object@large.scale.cnv.events$LargeScaleAmp[sampleNames[x] == rownames(object@large.scale.cnv.events)], 
-                collapse = " ")), split = " ")))
+            chrWithEvents <- as.vector(unlist(strsplit(as.vector(paste(object@large.scale.cnv.events$LargeScaleAmp[sampleNames[x] == 
+                rownames(object@large.scale.cnv.events)], collapse = " ")), split = " ")))
             if (length(chrWithEvents) > 0) 
-                mergeScalesAmp[x, match(intersect(chrWithEvents, colnames(mergeScalesAmp)), colnames(mergeScalesAmp))] <- mergeScalesAmp[x, match(intersect(chrWithEvents, 
-                  colnames(mergeScalesAmp)), colnames(mergeScalesAmp))] + 1
+                mergeScalesAmp[x, match(intersect(chrWithEvents, colnames(mergeScalesAmp)), colnames(mergeScalesAmp))] <- mergeScalesAmp[x, 
+                  match(intersect(chrWithEvents, colnames(mergeScalesAmp)), colnames(mergeScalesAmp))] + 1
             
-            chrWithEvents <- as.vector(unlist(strsplit(as.vector(paste(object@large.scale.cnv.events$LargeScaleDel[sampleNames[x] == rownames(object@large.scale.cnv.events)], 
-                collapse = " ")), split = " ")))
+            chrWithEvents <- as.vector(unlist(strsplit(as.vector(paste(object@large.scale.cnv.events$LargeScaleDel[sampleNames[x] == 
+                rownames(object@large.scale.cnv.events)], collapse = " ")), split = " ")))
             if (length(chrWithEvents) > 0) 
-                mergeScalesDel[x, match(intersect(chrWithEvents, colnames(mergeScalesDel)), colnames(mergeScalesDel))] <- mergeScalesDel[x, match(intersect(chrWithEvents, 
-                  colnames(mergeScalesDel)), colnames(mergeScalesDel))] + 1
+                mergeScalesDel[x, match(intersect(chrWithEvents, colnames(mergeScalesDel)), colnames(mergeScalesDel))] <- mergeScalesDel[x, 
+                  match(intersect(chrWithEvents, colnames(mergeScalesDel)), colnames(mergeScalesDel))] + 1
             
         }
         
@@ -130,7 +130,8 @@ PerformSegmentationWithHMM <- function(object, cnv.scale, removeCentromere = T, 
     
     segments <- NULL
     for (i in 1:dim(data)[2]) {
-        rdata <- RangedData(IRanges(start = annotation$start, end = annotation$end), space = annotation$cytoband, copy = data[, i])
+        rdata <- RangedData(IRanges(start = annotation$start, end = annotation$end), space = annotation$cytoband, copy = data[, 
+            i])
         hmm.segments <- HMMsegment(rdata, param = object@hmmparam, verbose = F)
         segments <- rbind(segments, data.frame(ID = colnames(data)[i], hmm.segments$segs))
     }
@@ -230,7 +231,8 @@ generateLargeScaleEvents <- function(object) {
     amp <- extractEvents(segments = object@segments, cytoband = object@cytoband, type = "amp")
     del <- extractEvents(segments = object@segments, cytoband = object@cytoband, type = "del")
     final <- data.frame(amp = amp, del = del)
-    colnames(final) <- c("LargeScaleAmp", "FocalAmp", "LargeScaleAmpNum", "FocalAmpNum", "LargeScaleDel", "FocalDel", "LargeScaleDelNum", "FocalDelNum")
+    colnames(final) <- c("LargeScaleAmp", "FocalAmp", "LargeScaleAmpNum", "FocalAmpNum", "LargeScaleDel", "FocalDel", "LargeScaleDelNum", 
+        "FocalDelNum")
     object@large.scale.cnv.events <- final
     
     return(object)
