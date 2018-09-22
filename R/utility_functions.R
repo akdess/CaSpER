@@ -267,61 +267,6 @@ go.enrichment.BP<-function (genes, ontology, universe=character(0),
     return (sum)
 }
 
-# -------------------------------------------------------------------
-# GO MF enrichment
-#
-# -------------------------------------------------------------------
-
-go.enrichment.MF<-function (genes, ontology, universe=character(0),  
-        pvalue=0.05, annotation='org.Hs.eg.db', conditionalSearch=TRUE,genes2)
-{
-    
-    params = new ("GOHyperGParams", geneIds=unique(genes),  ontology="MF",  
-            annotation='org.Hs.eg.db',
-            universeGeneIds=unique(universe), pvalueCutoff =pvalue,  
-            conditional=TRUE,
-            testDirection = "over")
-    hgr <- hyperGTest (params)
-    tab<-summary(hgr)
-    geneIdsByCategory(hgr)
-    
-    geneSymbol.list<-sapply(tab$GOMFID,function(x){
-                entrezIds<-geneIdsByCategory(hgr)[[x]]
-                gs <-as.vector(unique(na.omit(unlist(mget (entrezIds,revmap(org.Hs.egALIAS2EG),ifnotfound=NA)))))
-                paste(intersect(genes2, gs),collapse=",")})
-    
-    sum<-cbind(tab,genes=as.vector(geneSymbol.list))
-    sum$FDR<- p.adjust(sum$Pvalue, 'fdr')
-    
-    return (sum)
-}
-
-# -------------------------------------------------------------------
-# KEGG enrichment
-#
-# -------------------------------------------------------------------
-
-kegg.enrichment<-function (genes, universe=character(0),  
-        pvalue=0.05, annotation='org.Hs.eg.db',genes2)
-{
-    params = new ("KEGGHyperGParams", geneIds=genes, 
-            annotation=annotation,
-            universeGeneIds=universe, pvalueCutoff = pvalue,  
-            testDirection = "over")
-    hgr <- hyperGTest (params)
-    tab<-summary(hgr)
-    geneIdsByCategory(hgr)
-    
-    geneSymbol.list<-sapply(tab$KEGGID,function(x){
-                entrezIds<-geneIdsByCategory(hgr)[[x]]
-                gs <-as.vector(unique(na.omit(unlist(mget (entrezIds,revmap(org.Hs.egALIAS2EG),ifnotfound=NA)))))
-                paste(intersect(genes2, gs),collapse=",")})
-    
-    sum<-cbind(tab,genes=as.vector(geneSymbol.list))
-    sum$FDR<- p.adjust(sum$Pvalue, 'fdr')
-    
-    return (sum)
-}
 
 
 getDiffExprGenes <- function(final.objects, sampleName, chrs, event.type)
@@ -372,16 +317,11 @@ generateEnrichmentSummary <- function(results, fileName)
     universe.id <- as.vector(unique(na.omit(unlist(as.list(org.Hs.egALIAS2EG)))))
     go.BP<-go.enrichment.BP(genes=entrez.id , ontology="BP",universe=universe.id,  
             pvalue=0.01, annotation='org.Hs.eg.db', conditionalSearch=TRUE, genes2=genes)
-    go.MF<-go.enrichment.MF(genes=entrez.id,
-            ontology="MF", universe=universe.id,
-            pvalue=0.01, annotation='org.Hs.eg.db', conditionalSearch=TRUE, genes2=genes)
-    kegg<-kegg.enrichment(genes=entrez.id,universe=universe.id,
-            pvalue=0.01, annotation='org.Hs.eg.db', genes2=genes)
-
-    write.xlsx(results, file=fileName, sheetName="sheet1", row.names=FALSE)
-    write.xlsx(go.BP, file=fileName, sheetName="sheet2", append=TRUE, row.names=FALSE)
-    write.xlsx(go.MF, file=fileName, sheetName="sheet3", append=TRUE, row.names=FALSE)
-    write.xlsx(kegg, file=fileName, sheetName="sheet4", append=TRUE, row.names=FALSE)
+    return(go.BP)
+    #write.xlsx(results, file=fileName, sheetName="sheet1", row.names=FALSE)
+    ##write.xlsx(go.BP, go.BP, go.BP), file=fileName, sheetName="sheet2", append=TRUE, row.names=FALSE)
+    #write.xlsx(go.MF, file=fileName, sheetName="sheet3", append=TRUE, row.names=FALSE)
+    #write.xlsx(kegg, file=fileName, sheetName="sheet4", append=TRUE, row.names=FALSE)
 }
 
 # finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 

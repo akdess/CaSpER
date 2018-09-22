@@ -1,52 +1,4 @@
-# setwd('C:\\Users\\aharmanci\\Google Drive\\uthealth\\codebase_yale\\codebase_uthealth') install('CaSpER')
-#' Initialize and setup the casper object
-#'
-#' Initializes the casper object and some optional filtering
-#' @param raw.data Raw input data
-#' @param project Project name (string)
-#' @param min.cells Include genes with detected expression in at least this
-#' many cells. Will subset the raw.data matrix as well. To reintroduce excluded
-#' genes, create a new object with a lower cutoff.
-#' @param min.genes Include cells where at least this many genes are detected.
-#' @param is.expr Expression threshold for 'detected' gene. For most datasets, particularly UMI
-#' datasets, will be set to 0 (default). If not, when initializing, this should be set to a level
-#' based on pre-normalized counts (i.e. require at least 5 counts to be treated as expresesd) All
-#' values less than this will be set to 0 (though maintained in object@raw.data).
-#' @param normalization.method Method for cell normalization. Default is no normalization.
-#' In this case, run NormalizeData later in the workflow. As a shortcut, you can specify a
-#' normalization method (i.e. LogNormalize) here directly.
-#' @param scale.factor If normalizing on the cell level, this sets the scale factor.
-#' @param do.scale In object@@scale.data, perform row-scaling (gene-based
-#' z-score). FALSE by default. In this case, run ScaleData later in the workflow. As a shortcut, you
-#' can specify do.scale = TRUE (and do.center = TRUE) here.
-#' @param do.center In object@@scale.data, perform row-centering (gene-based centering)
-#' @param names.field For the initial identity class for each cell, choose this field from the
-#' cell's column name
-#' @param names.delim For the initial identity class for each cell, choose this delimiter from the
-#' cell's column name
-#' @param meta.data Additional metadata to add to the casper object. Should be a data frame where
-#' the rows are cell names, and the columns are additional metadata fields
-#' @param display.progress display progress bar for normalization and/or scaling procedure.
-#' @param ... Ignored
-#'
-#' @return Returns a casper object with the raw data stored in object@@raw.data.
-#' object@@data, object@@meta.data, object@@ident, also initialized.
-#'
-#' @import stringr
-#' @import pbapply
-#' @importFrom utils packageVersion
-#' @importFrom Matrix colSums rowSums
-#'
-#' @export
-#'
-#' @examples
-#' pbmc_raw <- read.table(
-#'   file = system.file('extdata', 'pbmc_raw.txt', package = 'casper'),
-#'   as.is = TRUE
-#' )
-#' pbmc_small <- CreateCasperObject(raw.data = pbmc_raw)
-#' pbmc_small
-#'
+
 CreateCasperObject <- function(raw.data, annotation, control.sample.ids, cytoband, loh.name.mapping, cnv.scale, loh.scale, 
     method, loh, project = "casperProject", sequencing.type, expr.cutoff = 4.5, display.progress = TRUE, log.transformed = TRUE, 
     centered.threshold = 3, window.length = 50, length.iterations = 50, vis.bound = 2, noise.thr = 0.3, genomeVersion = "hg19", 
@@ -92,27 +44,7 @@ processMedianFiltering <- function(object) {
     return(object)
 }
 
-#' Old R based implementation of ScaleData. Scales and centers the data
-#'
-#' @param object casper object
-#' @param genes.use Vector of gene names to scale/center. Default is all genes in object@@data.
-#' @param data.use Can optionally pass a matrix of data to scale, default is object@data[genes.use,]
-#' @param do.scale Whether to scale the data.
-#' @param do.center Whether to center the data.
-#' @param scale.max Max value to accept for scaled data. The default is 10. Setting this can help
-#' reduce the effects of genes that are only expressed in a very small number of cells.
-#'
-#' @return Returns a casper object with object@@scale.data updated with scaled and/or centered data.
-#'
-#' @importFrom utils txtProgressBar setTxtProgressBar
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' pbmc_small <- ScaleDataR(object = pbmc_small)
-#' }
-#'
+
 PerformMedianFilter <- function(object, window.length = 50, length.iterations = 50) {
     
     median.filtered.data <- list()

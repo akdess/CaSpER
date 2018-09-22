@@ -23,10 +23,15 @@ CaSpER is developed under R version 3.4.3.
 
 You can install CaSpER R package using the following R commands:
 
+Install dependencies first:
+``` r
+source("https://bioconductor.org/biocLite.R")
+biocLite(c('HMMcopy', 'GenomeGraphs', 'biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats')
+```
+
 ``` r
 require(devtools)
 install_github("akdess/CaSpER")
-
 ```
 
 For extracting B-allele freqeuncies from RNA-Seq bam files download BAFExtract c++ source or binary code from [here](https://github.com/akdess/BAFExtract). 
