@@ -4,7 +4,6 @@ CreateCasperObject <- function(raw.data, annotation, control.sample.ids, cytoban
     centered.threshold = 3, window.length = 50, length.iterations = 50, vis.bound = 2, noise.thr = 0.3, genomeVersion = "hg19", 
     ...) {
     
-    casper.version <- packageVersion("casper")
     object <- new(Class = "casper", raw.data = raw.data, loh = loh, annotation = annotation, sequencing.type = sequencing.type, 
         control.sample.ids = control.sample.ids, project.name = project, version = casper.version, cytoband = cytoband, loh.name.mapping = loh.name.mapping, 
         cnv.scale = cnv.scale, loh.scale = loh.scale, method = method, window.length = window.length, length.iterations = length.iterations, 

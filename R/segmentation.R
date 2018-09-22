@@ -1,7 +1,4 @@
-#' @import DNACopy
-#' 
-#' 
-#' 
+
 generateParam <- function(object, scale = 4) {
     param <- data.frame(strength = 1e+07, e = 0.9999999, mu = quantile(object@control.normalized[[scale]], na.rm = TRUE, prob = c(0.01, 
         0.05, 0.5, 0.95, 0.99)), lambda = 20, nu = 2.1, kappa = c(0.05, 0.05, 0.8, 0.05, 0.05) * 1000, m = 0, eta = c(5, 5, 

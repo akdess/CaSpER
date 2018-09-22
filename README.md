@@ -24,10 +24,15 @@ CaSpER is developed under R version 3.4.3.
 You can install CaSpER R package using the following R commands:
 
 Install dependencies first:
+
 ``` r
+You may need to install libcurl-devel, libopenssl-devel and libxml2-devel
+ex: sudo yum -y install libxml2-devel.x86_64, sudo yum -y install libopenssl-devel.x86_64, sudo yum -y install libxml2-devel.x86_64
+
 source("https://bioconductor.org/biocLite.R")
 biocLite(c('HMMcopy', 'GenomeGraphs', 'biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
 ```
+
 Install CaSpER R package:
 ``` r
 require(devtools)

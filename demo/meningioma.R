@@ -9,12 +9,12 @@ library('biomaRt')
 ## control.sample.ids: samples that are used as normal
 ## samps: sample information
 ## genoMat: genotyping large scale CNV event summary 1: amplification, -1:deletion, 0: neutral
-load("yale_meningioma_data.rda")
+data("yale_meningioma_data.rda")
 
 ## "hg19_cytoband.rda" contains the following objects: 
 ## cytoband: hg19 cytoband information
 ## centromere: hg19 centromere information
-load("hg19_cytoband.rda")
+data("hg19_cytoband.rda")
 
 ## generate annotation data.frame
 #curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz" | gunzip -c | grep acen | head
