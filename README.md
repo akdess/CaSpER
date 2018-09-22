@@ -39,7 +39,7 @@ require(devtools)
 install_github("akdess/CaSpER")
 ```
 
-For extracting B-allele freqeuncies from RNA-Seq bam files download BAFExtract C++ source or binary code from [here](https://github.com/akdess/BAFExtract). 
+For extracting B-allele frequencies from RNA-Seq bam files download BAFExtract C++ source or binary code from [here](https://github.com/akdess/BAFExtract). 
 
 
 After downloading  source code type the following: 
