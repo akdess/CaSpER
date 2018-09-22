@@ -72,7 +72,9 @@ Step 2. Extract BAF values from RNA-Seq bam files
 <output_baf_file>: final output
 
 You can download and unzip <generate genome_fasta_pileup_dir> files from : 
+	
 [for hg38](https://www.dropbox.com/s/ysrcfcnk7z8gyit/hg38.zip?dl=0)
+
 [for hg19](https://www.dropbox.com/s/a3u8f2f8ufm5wdj/hg19.zip?dl=0)
 	
 To generate <genome_list> file: 
