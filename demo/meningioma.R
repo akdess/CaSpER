@@ -37,7 +37,7 @@ order.sampleNames <- c("MN-1171",  "MN-60835" ,"MN-1236" , "MN-1237" , "MN-1137"
 
 ## plot median filtered gene expression matrix 
 obj <- final.objects[[9]]
-plotHeatmap(obj, order.sampleNames, fileName="heatmap.png")
+plotHeatmap(object=obj, fileName="heatmap.png",cnv.scale= 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T)
 
 ## summarize large scale events 
 finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 

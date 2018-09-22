@@ -23,7 +23,7 @@ object <- CreateCasperObject(raw.data=data,loh.name.mapping=loh.name.mapping,
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 
 ## plot median filtered gene expression matrix 
-plotHeatmap(object, fileName="heatmap.png", cnv.scale = 3, show_rownames=F)
+plotHeatmap(object, fileName="heatmap.png", cnv.scale= 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T)
 
 ## summarize large scale events 
 finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 

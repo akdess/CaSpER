@@ -41,7 +41,7 @@ draw_matrix2 <- function(matrix, border_color, gaps_rows, gaps_cols, fmat, fonts
 }
 
 
-plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
+plotHeatmap <- function(object, fileName, cnv.scale= 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
     
     assignInNamespace(x = "draw_matrix", value = draw_matrix2, ns = asNamespace("pheatmap"))
     assignInNamespace(x = "draw_colnames", value = "draw_colnames_45", ns = asNamespace("pheatmap"))
