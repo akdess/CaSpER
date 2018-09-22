@@ -20,7 +20,7 @@ object <- CreateCasperObject(raw.data=data,loh.name.mapping=loh.name.mapping,
               control.sample.ids="REF", cytoband=cytoband)
 
 ## runCaSpER
-final.objects <- runCaSPER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
+final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 
 ## plot median filtered gene expression matrix 
 plotHeatmap(object, fileName="heatmap.png", cnv.scale = 3, show_rownames=F)
