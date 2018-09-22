@@ -5,7 +5,7 @@ CreateCasperObject <- function(raw.data, annotation, control.sample.ids, cytoban
     ...) {
     
     object <- new(Class = "casper", raw.data = raw.data, loh = loh, annotation = annotation, sequencing.type = sequencing.type, 
-        control.sample.ids = control.sample.ids, project.name = project, version = casper.version, cytoband = cytoband, loh.name.mapping = loh.name.mapping, 
+        control.sample.ids = control.sample.ids, project.name = project,  cytoband = cytoband, loh.name.mapping = loh.name.mapping, 
         cnv.scale = cnv.scale, loh.scale = loh.scale, method = method, window.length = window.length, length.iterations = length.iterations, 
         vis.bound = vis.bound, noise.thr = noise.thr, genomeVersion = genomeVersion)
     # filter cells on number of genes detected modifies the raw.data slot as well now

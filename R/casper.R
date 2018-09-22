@@ -9,7 +9,7 @@
 casper <- methods::setClass("casper", slots = c(raw.data = "ANY", data = "ANY", median.filtered.data = "ANY", loh.median.filtered.data = "ANY", 
     centered.data = "ANY", center.smoothed.data = "ANY", control.normalized = "ANY", control.normalized.visbound = "ANY", control.normalized.visbound.noiseRemoved = "ANY", 
     large.scale.cnv.events = "ANY", segments = "ANY", cytoband = "ANY", annotation = "ANY", annotation.filt = "ANY", control.sample.ids = "character", 
-    project.name = "character", genomeVersion = "ANY", version = "ANY", hmmparam = "ANY", plotorder = "ANY", vis.bound = "ANY", 
+    project.name = "character", genomeVersion = "ANY", hmmparam = "ANY", plotorder = "ANY", vis.bound = "ANY", 
     noise.thr = "ANY", loh.name.mapping = "ANY", sequencing.type = "ANY", cnv.scale = "ANY", loh.scale = "ANY", method = "ANY", 
     loh.shift.thr = "ANY", window.length = "ANY", length.iterations = "ANY", loh = "ANY"))
 
