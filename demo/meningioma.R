@@ -19,9 +19,9 @@ data("hg19_cytoband")
 annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(data), ishg19=T, centromere)
 data <- data[match( annotation$Gene,rownames(data)), ]
 
-## read BAF extract output put 
-loh <- readBAFExtractOutput ( path="./meningioma_baf\\", sequencing.type="bulk")
-names(loh) <- gsub(".snp", "", names(loh))
+## read BAF extract output  
+#loh <- readBAFExtractOutput ( path="./meningioma_baf\\", sequencing.type="bulk")
+#names(loh) <- gsub(".snp", "", names(loh))
 
 ## create CaSpER object 
 object <- CreateCasperObject(raw.data=data,loh.name.mapping=loh.name.mapping, sequencing.type="bulk", 
@@ -30,7 +30,7 @@ object <- CreateCasperObject(raw.data=data,loh.name.mapping=loh.name.mapping, se
   control.sample.ids=control.sample.ids, cytoband=cytoband)
 
 ## runCaSpER
-final.objects <- runCaSPER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
+final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 
 ## sample plot orders
 order.sampleNames <- c("MN-1171",  "MN-60835" ,"MN-1236" , "MN-1237" , "MN-1137" , "MN-1161" , "MN-60" ,   "MN-5" ) 
