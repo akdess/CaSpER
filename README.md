@@ -26,9 +26,9 @@ You can install CaSpER R package using the following R commands:
 Install dependencies first:
 ``` r
 source("https://bioconductor.org/biocLite.R")
-biocLite(c('HMMcopy', 'GenomeGraphs', 'biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats')
+biocLite(c('HMMcopy', 'GenomeGraphs', 'biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
 ```
-
+Install CaSpER R package:
 ``` r
 require(devtools)
 install_github("akdess/CaSpER")
