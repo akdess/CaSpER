@@ -1,7 +1,5 @@
 
 library(CaSpER)
-library('biomaRt')
-
 ## "yale_meningioma_data.rda" contains the following objects: 
 ## data: normalized gene expression matrix
 ## loh.name.mapping: data.frame for mapping loh files to expression files
@@ -9,19 +7,19 @@ library('biomaRt')
 ## control.sample.ids: samples that are used as normal
 ## samps: sample information
 ## genoMat: genotyping large scale CNV event summary 1: amplification, -1:deletion, 0: neutral
-data("yale_meningioma_data.rda")
+data("yale_meningioma_data")
 
 ## "hg19_cytoband.rda" contains the following objects: 
 ## cytoband: hg19 cytoband information
 ## centromere: hg19 centromere information
-data("hg19_cytoband.rda")
+data("hg19_cytoband")
 
 ## generate annotation data.frame
 #curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz" | gunzip -c | grep acen | head
 annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(data), ishg19=T, centromere)
 data <- data[match( annotation$Gene,rownames(data)), ]
 
-## read BAF extract output 
+## read BAF extract output put 
 loh <- readBAFExtractOutput ( path="./meningioma_baf\\", sequencing.type="bulk")
 names(loh) <- gsub(".snp", "", names(loh))
 
