@@ -10,7 +10,7 @@ generateParam <- function(object, scale = 4) {
     return(object)
 }
 
-runCaSPER <- function(object, removeCentromere = T, cytoband = object@cytoband, method = "iterative") {
+runCaSpER <- function(object, removeCentromere = T, cytoband = object@cytoband, method = "iterative") {
     final.objects <- list()
     
     if (method == "iterative") {
