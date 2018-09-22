@@ -37,7 +37,7 @@ order.sampleNames <- c("MN-1171",  "MN-60835" ,"MN-1236" , "MN-1237" , "MN-1137"
 
 ## plot median filtered gene expression matrix 
 obj <- final.objects[[9]]
-runCaSpER(obj, order.sampleNames, fileName="heatmap.png")
+plotHeatmap(obj, order.sampleNames, fileName="heatmap.png")
 
 ## summarize large scale events 
 finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 
