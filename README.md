@@ -27,7 +27,7 @@ Install dependencies first:
 
 ``` r
 You may need to install libcurl-devel, libopenssl-devel and libxml2-devel
-ex: sudo yum -y install libxml2-devel.x86_64, sudo yum -y install libopenssl-devel.x86_64, sudo yum -y install libxml2-devel.x86_64
+ex: sudo yum -y install libxml2-devel.x86_64
 
 source("https://bioconductor.org/biocLite.R")
 biocLite(c('HMMcopy', 'GenomeGraphs', 'biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
