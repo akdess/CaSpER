@@ -10,12 +10,12 @@ library('biomaRt')
 ## control.sample.ids: samples that are used as normal
 ## samps: sample information
 ## genoMat: genotyping large scale CNV event summary 1: amplification, -1:deletion, 0: neutral
-load("tcga_gbm_data.rda")
+load("./data/tcga_gbm_data.rda")
 
 ## "hg19_cytoband.rda" contains the following objects: 
 ## cytoband: hg19 cytoband information
 ## centromere: hg19 centromere information
-load("hg19_cytoband.rda")
+load("./data/hg19_cytoband.rda")
 
 ## generate annotation data.frame
 

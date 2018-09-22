@@ -11,7 +11,7 @@ It takes as input:
 
 and outputs: 
 
-- CNV events in mutliscale resolution
+- CNV events in multiscale resolution
 
 - Mutually exclusive and co-occurent CNV events
 
@@ -34,7 +34,7 @@ require(devtools)
 install_github("akdess/CaSpER")
 ```
 
-For extracting B-allele freqeuncies from RNA-Seq bam files download BAFExtract c++ source or binary code from [here](https://github.com/akdess/BAFExtract). 
+For extracting B-allele freqeuncies from RNA-Seq bam files download BAFExtract C++ source or binary code from [here](https://github.com/akdess/BAFExtract). 
 
 
 After downloading  source code type the following: 
@@ -63,21 +63,14 @@ Step 2. Extract BAF values from RNA-Seq bam files
 ```{bash}
 	samtools view <bam_file> | ./BAFExtract -generate_compressed_pileup_per_SAM stdin <genome_list> <sample_dir> 50 0; ./BAFExtract -get_SNVs_per_pileup  <genome_list> <sample_dir> <genome_fasta_pileup_dir> 20 4 0.1 <output_baf_file>
 ```
+<sample_dir>: the name of sample directory
+<output_baf_file>: final output
 
-To generate genome_fasta_pileup_dir: 
+You can download and unzip <generate genome_fasta_pileup_dir> files from : 
+[for hg38](https://www.dropbox.com/s/ysrcfcnk7z8gyit/hg38.zip?dl=0)
+[for hg19](https://www.dropbox.com/s/a3u8f2f8ufm5wdj/hg19.zip?dl=0)
 	
-for hg38: 
-```{bash}
-		wget -c http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chromFa.tar.gz; tar -xvzf hg38.chromFa.tar.gz
-		cd <genome_fasta_pileup_dir>; genome_sequence_tools -binarize_fasta_per_dir . . fa
-```
-for hg19: 
-```{bash}
-		wget -c http://hgdownload.soe.ucsc.edu/goldenPath/hg19/bigZips/chromFa.tar.gz; tar -xvzf hg38.chromFa.tar.gz
-		cd <genome_fasta_pileup_dir>; genome_sequence_tools -binarize_fasta_per_dir . . fa
-```
-	
-To generate genome_list file: 
+To generate <genome_list> file: 
 
 first download http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/fetchChromSizes
 

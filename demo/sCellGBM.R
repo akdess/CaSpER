@@ -7,7 +7,7 @@ library(xlsx)
 ## loh.name.mapping: data.frame for mapping loh files to expression files
 ## annotation
 ## loh 
-load("sCell_gbm_data.rda")
+load("./data/sCell_gbm_data.rda")
 
 annotation <- generateAnnotation(id_type="hgnc_symbol", genes=rownames(data), ishg19=T, centromere)
 data <- data[match(annotation$Gene,rownames(data)), ]
