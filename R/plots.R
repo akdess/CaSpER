@@ -41,7 +41,7 @@ draw_matrix2 <- function(matrix, border_color, gaps_rows, gaps_cols, fmat, fonts
 }
 
 
-plotHeatmap <- function(object, fileName, cnv.scale= 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
+plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
     
     assignInNamespace(x = "draw_matrix", value = draw_matrix2, ns = asNamespace("pheatmap"))
     assignInNamespace(x = "draw_colnames", value = "draw_colnames_45", ns = asNamespace("pheatmap"))
@@ -405,7 +405,7 @@ plotSingleCellLargeScaleEventHeatmap <- function(finalChrMat, sampleName, chrs) 
         axis.ticks = element_line(size = 0.4), plot.title = element_text(colour = "black", hjust = 0, size = 6, face = "bold"))
     
     
-    ggsave(paste0(title, ".png"), plot = p, width = 1, height = 3)
+    ggsave(paste0(title, ".pdf"), plot = p, width = 1, height = 3)
     
     
 }
