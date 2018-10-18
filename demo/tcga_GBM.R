@@ -17,7 +17,6 @@ data("tcga_gbm")
 data("hg19_cytoband")
 
 data <- tcga_gbm$data
-annotation <- tcga_gbm$annotation
 loh <-  tcga_gbm$loh
 loh.name.mapping <-  tcga_gbm$loh.name.mapping
 control.sample.ids <-  tcga_gbm$control.sample.ids
@@ -25,8 +24,8 @@ genoMat <-  tcga_gbm$genoMat
 samps <-  tcga_gbm$samps
 
 ## generate annotation data.frame
-#annotation <- generateAnnotation(id_type="hgnc_symbol", genes=rownames(data), ishg19=T, centromere)
-#data <- data[match( annotation$Gene,rownames(data)), ]
+annotation <- generateAnnotation(id_type="hgnc_symbol", genes=rownames(data), ishg19=T, centromere)
+data <- data[match( annotation$Gene,rownames(data)), ]
 
 ## create CaSpER object 
 
