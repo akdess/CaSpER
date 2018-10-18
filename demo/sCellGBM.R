@@ -56,27 +56,23 @@ plotSCellCNVTree (finalChrMat, sampleName="MGH31", path="C:\\Users\\aharmanci\\D
 
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH31", chrs=c("5q", "14q"), event.type=c(1, -1))
-generateEnrichmentSummary (results=all.summary, fileName="5q14q.xlsx")
+enrichment <- generateEnrichmentSummary (results=all.summary)
 
 all.summary <- getDiffExprGenes(final.objects, sampleName="MGH31", chrs=c("1p", "13q"), event.type=c(1, -1))
-generateEnrichmentSummary (results=all.summary, fileName="1p13q.xlsx")
+enrichment <- generateEnrichmentSummary (results=all.summary)
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH31", chrs=c("5q", "13q"), event.type=c(1, -1))
-generateEnrichmentSummary (results=all.summary, fileName="5q13q.xlsx")
+enrichment <- generateEnrichmentSummary (results=all.summary)
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH28", chrs=c("8q", "20p"), event.type=c(1, -1))
-
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH30", chrs=c("7p", "6p"), event.type=c(1, -1))
 
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH26", chrs=c("1q", "22q"), event.type=c(1, -1))
 genes <- as.character(all.summary$ID[all.summary$adj.P.Val<0.05])
-generateEnrichmentSummary (results=all.summary, fileName="1q22q.xlsx")
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH28", chrs=c("5q", "19q"), event.type=c(1, -1))
 genes <- as.character(all.summary$ID[all.summary$adj.P.Val<0.05])
-generateEnrichmentSummary (results=all.summary, fileName="5q19q.xlsx")
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH29", chrs=c("10p", "4p"), event.type=c(-1, -1))
 genes <- as.character(all.summary$ID[all.summary$adj.P.Val<0.05])
-generateEnrichmentSummary (results=all.summary, fileName="10p4p.xlsx")
