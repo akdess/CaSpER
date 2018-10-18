@@ -37,7 +37,7 @@ finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75)
 ## plot large scale events using event summary matrix 1: amplification, -1:deletion, 0: neutral
 plotLargeScaleEvent2 (finalChrMat, fileName="large.scale.events.summarized.pdf") 
 ## plot BAF deviation for all samples together in one plot (can be used only with small sample size)
-plotBAFAllSamples (loh = obj@loh.median.filtered.data,  fileName="LOHAllSamples.png") 
+plotBAFAllSamples (loh = final.objects[[1]]@loh.median.filtered.data,  fileName="LOHAllSamples.png") 
 ## plot BAF signal in different scales for all samples
 plotBAFOneSample (object, fileName="LohPlotsAllScales.pdf") 
 ## plot large scale event summary for selected sample and chromosomes
