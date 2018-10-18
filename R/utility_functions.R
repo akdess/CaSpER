@@ -217,7 +217,7 @@ generateAnnotation <- function(id_type = "ensembl_gene_id", genes, ishg19, centr
     ord <- match(common, G_list[, id_type])
     annotation <- G_list[ord, ]
     annotation <- annotation[order(annotation$start_position), ]
-    annotation$cytoband <- paste0(annotation$chromosome_name, substr(unique(annotation$band), 0, 1))
+    annotation$cytoband <- paste0(annotation$chromosome_name, substr((annotation$band), 0, 1))
     
     chr.list <- as.character(1:22, "X")
     idx <- unlist(unique(as.vector(sapply(chr.list, function(x) as.vector(unlist(which(as.character(annotation$chromosome_name) == 
