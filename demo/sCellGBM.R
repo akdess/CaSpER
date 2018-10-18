@@ -61,17 +61,14 @@ plotMUAndCooccurence (results)
 
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH31", chrs=c("5q", "14q"), event.type=c(1, -1))
-enrichment <- generateEnrichmentSummary (results=all.summary)
+#enrichment <- generateEnrichmentSummary (results=all.summary)
 
 all.summary <- getDiffExprGenes(final.objects, sampleName="MGH31", chrs=c("1p", "13q"), event.type=c(1, -1))
-enrichment <- generateEnrichmentSummary (results=all.summary)
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH31", chrs=c("5q", "13q"), event.type=c(1, -1))
-enrichment <- generateEnrichmentSummary (results=all.summary)
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH28", chrs=c("8q", "20p"), event.type=c(1, -1))
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH30", chrs=c("7p", "6p"), event.type=c(1, -1))
-
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH26", chrs=c("1q", "22q"), event.type=c(1, -1))
 genes <- as.character(all.summary$ID[all.summary$adj.P.Val<0.05])
