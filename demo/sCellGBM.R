@@ -1,6 +1,5 @@
 
 library(CaSpER)
-library(xlsx)
 
 ## "sCell_gbm_data.rda" contains the following objects: 
 ## data: normalized gene expression matrix

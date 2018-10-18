@@ -1,7 +1,6 @@
 
 
 library(CaSpER)
-library('biomaRt')
 ## "tcga_gbm_data.rda" contains the following objects: 
 ## data: normalized gene expression matrix
 ## loh.name.mapping: data.frame for mapping loh files to expression files
