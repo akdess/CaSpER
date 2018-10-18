@@ -14,8 +14,9 @@ annotation <- scell_gbm$annotation
 loh <-  scell_gbm$loh
 loh.name.mapping <-  scell_gbm$loh.name.mapping
 
-annotation <- generateAnnotation(id_type="hgnc_symbol", genes=rownames(data), ishg19=T, centromere)
-data <- data[match(annotation$Gene,rownames(data)), ]
+## generate annotation data.frame
+#annotation <- generateAnnotation(id_type="hgnc_symbol", genes=rownames(data), ishg19=T, centromere)
+#data <- data[match(annotation$Gene,rownames(data)), ]
 
 ## create CaSpER object
 object <- CreateCasperObject(raw.data=data,loh.name.mapping=loh.name.mapping, 

@@ -26,9 +26,8 @@ genoMat <-  tcga_gbm$genoMat
 samps <-  tcga_gbm$samps
 
 ## generate annotation data.frame
-
-annotation <- generateAnnotation(id_type="hgnc_symbol", genes=rownames(data), ishg19=T, centromere)
-data <- data[match( annotation$Gene,rownames(data)), ]
+#annotation <- generateAnnotation(id_type="hgnc_symbol", genes=rownames(data), ishg19=T, centromere)
+#data <- data[match( annotation$Gene,rownames(data)), ]
 
 ## create CaSpER object 
 

@@ -24,8 +24,8 @@ samps <-  yale_meningioma$samps
 
 ## generate annotation data.frame
 #curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz" | gunzip -c | grep acen | head
-annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(data), ishg19=T, centromere)
-data <- data[match( annotation$Gene,rownames(data)), ]
+#annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(data), ishg19=T, centromere)
+#data <- data[match( annotation$Gene,rownames(data)), ]
 
 ## read BAF extract output  
 #loh <- readBAFExtractOutput ( path="./meningioma_baf\\", sequencing.type="bulk")
