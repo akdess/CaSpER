@@ -310,7 +310,7 @@ getDiffExprGenes <- function(final.objects, sampleName, chrs, event.type)
     
 }
 
-generateEnrichmentSummary <- function(results, fileName)
+generateEnrichmentSummary <- function(results)
 {
     genes <- as.character(results$ID[results$adj.P.Val<0.05])
     entrez.id <-as.vector(unique(na.omit(unlist(mget (genes,org.Hs.egALIAS2EG,ifnotfound=NA)))))
