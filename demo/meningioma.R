@@ -7,12 +7,20 @@ library(CaSpER)
 ## control.sample.ids: samples that are used as normal
 ## samps: sample information
 ## genoMat: genotyping large scale CNV event summary 1: amplification, -1:deletion, 0: neutral
-data("yale_meningioma_data")
+data("yale_meningioma")
 
 ## "hg19_cytoband.rda" contains the following objects: 
 ## cytoband: hg19 cytoband information
 ## centromere: hg19 centromere information
 data("hg19_cytoband")
+
+data <- yale_meningioma$data
+annotation <- yale_meningioma$annotation
+loh <-  yale_meningioma$loh
+loh.name.mapping <-  yale_meningioma$loh.name.mapping
+control.sample.ids <-  yale_meningioma$control.sample.ids
+genoMat <-  yale_meningioma$genoMat
+samps <-  yale_meningioma$samps
 
 ## generate annotation data.frame
 #curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz" | gunzip -c | grep acen | head
@@ -41,7 +49,7 @@ plotHeatmap(object=obj, fileName="heatmap.png",cnv.scale= 3, cluster_cols = F, c
 
 ## summarize large scale events 
 finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 
-common <- intersect(order.sampleNames, intersect(rownames(finalChrMat), rownames(genoMat)))
+common <- intersect(order.sampleNames, intersect(rownames(finalChrMat), rownames(genoMat <- )))
 finalChrMat <- finalChrMat[match(common, rownames(finalChrMat)), ]
 genoMat <- genoMat[match(common, rownames(genoMat)), ]
     
