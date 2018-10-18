@@ -49,7 +49,7 @@ plotHeatmap(object=obj, fileName="heatmap.png",cnv.scale= 3, cluster_cols = F, c
 
 ## summarize large scale events 
 finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 
-common <- intersect(order.sampleNames, intersect(rownames(finalChrMat), rownames(genoMat <- )))
+common <- intersect(order.sampleNames, intersect(rownames(finalChrMat), rownames(genoMat)))
 finalChrMat <- finalChrMat[match(common, rownames(finalChrMat)), ]
 genoMat <- genoMat[match(common, rownames(genoMat)), ]
     
