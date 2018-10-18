@@ -58,7 +58,8 @@ results <- extractMUAndCooccurence (finalChrMat, loh, loh.name.mapping)
 ## visualize mutual exclusive and co-occurent events
 plotMUAndCooccurence (results)
 ## visualize CNV pyhlogenetic tree 
-plotSCellCNVTree (finalChrMat, sampleName="MGH31", path="C:\\Users\\aharmanci\\Downloads\\phylip-3.695\\phylip-3.695\\exe", fileName="CNVTree.pdf")
+## first please download pyhlip package from http://evolution.genetics.washington.edu/phylip/getme-new1.html
+#plotSCellCNVTree (finalChrMat, sampleName="MGH31", path="C:\\Users\\aharmanci\\Downloads\\phylip-3.695\\phylip-3.695\\exe", fileName="CNVTree.pdf")
 
 
 all.summary <- getDiffExprGenes(final.objects,  sampleName="MGH31", chrs=c("5q", "14q"), event.type=c(1, -1))
