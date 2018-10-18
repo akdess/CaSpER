@@ -15,7 +15,7 @@ data("tcga_gbm_data")
 ## "hg19_cytoband.rda" contains the following objects: 
 ## cytoband: hg19 cytoband information
 ## centromere: hg19 centromere information
-load("hg19_cytoband")
+data("hg19_cytoband")
 
 ## generate annotation data.frame
 
