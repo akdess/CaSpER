@@ -37,6 +37,7 @@ object <- CreateCasperObject(raw.data=data, loh.name.mapping=loh.name.mapping,
               control.sample.ids=control.sample.ids, cytoband=cytoband)
 
 ## runCaSpER
+## this might take some time
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 
 ## plot median filtered gene expression matrix
