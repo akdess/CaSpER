@@ -9,8 +9,8 @@ library(CaSpER)
 ## control.sample.ids: samples that are used as normal
 ## samps: sample information
 ## genoMat: genotyping large scale CNV event summary 1: amplification, -1:deletion, 0: neutral
-data("tcga_gbm")
-
+#Download rdata from: https://www.dropbox.com/s/thx3jt589kps886/tcga_gbm.rda?dl=0
+load("tcga_gbm.rda")
 ## "hg19_cytoband.rda" contains the following objects: 
 ## cytoband: hg19 cytoband information
 ## centromere: hg19 centromere information

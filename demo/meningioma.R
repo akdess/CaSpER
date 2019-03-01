@@ -56,6 +56,7 @@ genoMat <- genoMat[match(common, rownames(genoMat)), ]
 calcROC(chrMat=finalChrMat, chrMat2=genoMat)
 
 ## segment based summary    
+library(GenomicRanges)
 gamma <- 6
 all.segments <- do.call(rbind, lapply(final.objects, function(x) x@segments))
 segment.summary <- extractSegmentSummary (final.objects)
@@ -70,8 +71,8 @@ colnames(all.summary) [2:4] <- c("Chromosome", "Start",   "End")
 rna <-  GRanges(seqnames = Rle(gsub("q", "", gsub("p", "", all.summary$Chromosome))), 
     IRanges(all.summary$Start, all.summary$End))   
 ann.gr <- makeGRangesFromDataFrame(final.objects[[1]]@annotation.filt, keep.extra.columns = TRUE, seqnames.field="Chr")
-hits <- findOverlaps(geno.rna, ann.gr)
-genes <- splitByOverlap(ann.gr, geno.rna, "GeneSymbol")
+hits <- findOverlaps(rna, ann.gr)
+genes <- splitByOverlap(ann.gr, rna, "GeneSymbol")
 genes.ann <- lapply(genes, function(x) x[!(x=="")])
 all.genes <- unique(final.objects[[1]]@annotation.filt[,2])
 all.samples <- unique(as.character(final.objects[[1]]@segments$ID))
@@ -104,7 +105,7 @@ plotBAFAllSamples (loh = obj@loh.median.filtered.data,  fileName="LOHAllSamples.
 ## plot gene expression signal for each sample seperately
 plotGEAllSamples (object=obj, fileName="GEAllSamples.pdf", cnv.scale=3) 
 ## plot gene expression and BAF signal for one sample in one plot
-plotGEAndBAFOneSample (object=obj, cnv.scale=3, loh.scale=3, sample= "MN-1237")
+plotGEAndBAFOneSample (object=obj, cnv.scale=3, loh.scale=3, sample= "MN-5")
 ## plot BAF signal in different scales for all samples
 plotBAFOneSample (object, fileName="LohPlotsAllScales.pdf") 
   
