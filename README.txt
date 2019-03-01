@@ -25,32 +25,32 @@ You can install CaSpER R package using the following R commands:
 
 Install dependencies first:
 
-``` r
-You may need to install libcurl-devel, libopenssl-devel openssl-devel and libxml2-devel
-ex: sudo yum -y install libxml2-devel libcurl-devel libopenssl-devel openssl-devel
+You need to install libcurl-devel, libopenssl-devel, openssl-devel, and libxml2-devel
+>> sudo yum -y install libxml2-devel libcurl-devel libopenssl-devel openssl-devel
 
-source("https://bioconductor.org/biocLite.R")
-biocLite(c('HMMcopy', 'GenomeGraphs', 'biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
-```
+Next it is necessary to install R package dependencies
+>> source("https://bioconductor.org/biocLite.R")
+>> biocLite(c('HMMcopy', 'GenomeGraphs', 'biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
 
-Install CaSpER R package:
-``` r
-require(devtools)
-install_github("akdess/CaSpER")
-```
+Finally, to install CaSpER R package, use following:
+>> require(devtools)
+>> install_github("akdess/CaSpER")
 
-For extracting B-allele frequencies from RNA-Seq bam files download BAFExtract C++ source or binary code from [here](https://github.com/akdess/BAFExtract). 
+These commands are included in install_dependencies.sh and install_dependencies.R scripts.
 
+Please note that you may need to be root to install these dependencies.
 
-After downloading  source code type the following: 
-``` r
+For extracting B-allele frequencies from RNA-Seq bam files download BAFExtract C++ source or binary code from https://github.com/akdess/BAFExtract. 
+
+After downloading source code type the following: 
+
 cd BAFExtract
 make clean
 make
 
-```
-The executable is located under directory /bin. 
+The executable is built under directory /bin. 
 
+BAFExtract is developed and tested under CentOS 7.
 
 Usage
 ----------
@@ -58,20 +58,17 @@ Usage
 
 Step 1. Merge single cell RNA-Seq bam files (required for single-cell studies)
 
-```{bash} 
-	 bamtools merge -list <bam_file_names> -out <sample_name>_merged.bam 
-	 samtools index <sample_name>_merged.bam
-```
+>> bamtools merge -list <bam_file_names> -out <sample_name>_merged.bam 
+>> samtools index <sample_name>_merged.bam
 
 Step 2. Extract BAF values from RNA-Seq bam files
 	
-```{bash}
-	samtools view <bam_file> | ./BAFExtract -generate_compressed_pileup_per_SAM stdin <genome_list> <sample_dir> 50 0; ./BAFExtract -get_SNVs_per_pileup  <genome_list> <sample_dir> <genome_fasta_pileup_dir> 20 4 0.1 <output_baf_file>
-```
+>> samtools view <bam_file> | ./BAFExtract -generate_compressed_pileup_per_SAM stdin <genome_list> <sample_dir> 50 0; ./BAFExtract -get_SNVs_per_pileup  <genome_list> <sample_dir> <genome_fasta_pileup_dir> 20 4 0.1 <output_baf_file>
+where 
 <sample_dir>: the name of sample directory
 <output_baf_file>: final output
 
-You can download and unzip generate genome_fasta_pileup_dir files from : 
+You can download and unzip  genome_fasta_pileup_dir files from : 
 
 [for hg38](https://www.dropbox.com/s/ysrcfcnk7z8gyit/hg38.zip?dl=0)
 
@@ -83,6 +80,7 @@ You can download genome_list files from :
 	
 [for hg19](https://www.dropbox.com/s/jcmt23nmuzm6poz/hg19.list?dl=0) 
 
+
 Example run for BAFExtract:
 
 [download example rna-seq bam file](https://www.dropbox.com/s/1vl6iip0b8jwu66/SRR1295366.sorted.bam?dl=0)
@@ -93,14 +91,12 @@ mkdir test; samtools view SRR1295366.sorted.bam | ./bin/BAFExtract -generate_com
 
 Step 3. Run CaSpER R package (See tutorials below)
 
-
 Tutorials
 ----------
 
 1. [Yale meningioma Bulk RNA-Seq dataset](/demo/meningioma.R)
 2. [TCGA-GBM Bulk RNA-Seq dataset](/demo/tcga_GBM.R)
 3. [GBM Single-cell RNA-Seq dataset](/demo/sCellGBM.R)
-
 
 For running the examples, you can use Rscript command:
 Rscript /demo/meningioma.R
