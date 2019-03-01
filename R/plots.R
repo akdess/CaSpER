@@ -6,7 +6,8 @@ draw_colnames_45 <- function(coln, gaps, ...) {
     return(res)
 }
 
-
+#@description helper function for plotHeatmap
+# 
 draw_matrix2 <- function(matrix, border_color, gaps_rows, gaps_cols, fmat, fontsize_number, number_color) {
     
     n = nrow(matrix)
@@ -40,7 +41,27 @@ draw_matrix2 <- function(matrix, border_color, gaps_rows, gaps_cols, fmat, fonts
     return(res)
 }
 
-
+#' @title plotHeatmap()
+#'
+#' @description  Visualization of the genomewide gene expression signal plot at different smoothing scales 
+#'
+#' @param object casper object
+#' 
+#' @param fileName fileName of the putput image
+#'
+#' @param cnv.scale expression.scale for the expression signal 
+#'
+#' @param cluster_cols boolean values determining if columns should be clustered 
+#'
+#' @param cluster_rows boolean values determining if rows should be clustered 
+#'
+#' @param show_rownames boolean values determining if rownames should be plotted
+#'
+#' @param only_soi boolean values determining if only samples of interest without control samples should be plotted
+#'
+#' @export
+#'
+#'
 plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
     
     assignInNamespace(x = "draw_matrix", value = draw_matrix2, ns = asNamespace("pheatmap"))
@@ -60,12 +81,24 @@ plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, clust
     if (only_soi) 
         data <- data[, !(colnames(data) %in% object@control.sample.ids)]
     
-    pheatmap(t(data), cluster_cols = cluster_cols, cluster_rows = cluster_rows, gaps_col = idx, color = color, breaks = breaks, 
-        labels_col = xlabel, show_rownames = show_rownames, filename = fileName)
+    pheatmap(t(data), cluster_cols = F, cluster_rows = T, gaps_col = idx, color = color, breaks = breaks, 
+        labels_col = xlabel, show_rownames = T, filename = "test.png")
     
 }
 
-## practical for around 20 samples
+#' @title plotGEAndGT()
+#'
+#' @description  Heatmap plot for large scale event calls identified by CaSpER and genotyping array.
+#'
+#' @param chrMat large scale events identified from CaSpER represented as matrix. Rows indicates samples (cells) whereas columns indicates chromosome arms
+#' 
+#' @param genoMat large scale events identified from genotyping array represented as matrix. Rows indicates samples (cells) whereas columns indicates chromosome arms
+#'
+#' @param fileName fileName of the putput image
+#'
+#' @export
+#'
+#'
 plotGEAndGT <- function(chrMat, genoMat, fileName) {
     rownames(genoMat) <- paste0(rownames(genoMat), "_GT")
     rownames(chrMat) <- paste0(rownames(chrMat), "_RNASeq")
@@ -92,6 +125,17 @@ plotGEAndGT <- function(chrMat, genoMat, fileName) {
     
 }
 
+#' @title plotLargeScaleEvent2()
+#'
+#' @description Visualization of the  large-scale CNV events among all the samples/cells
+#'
+#' @param chrMat large scale events identified from CaSpER represented as matrix. Rows indicates samples (cells) whereas columns indicates chromosome arms
+#' 
+#' @param fileName fileName of the output image
+#'
+#' @export
+#'
+#'
 plotLargeScaleEvent2 <- function(chrMat, fileName) {
     
     
@@ -114,8 +158,17 @@ plotLargeScaleEvent2 <- function(chrMat, fileName) {
     
 }
 
-
-
+#' @title plotLargeScaleEvent()
+#'
+#' @description  Visualization of the  large-scale CNV events among all the samples/cells
+#'
+#' @param object casper object
+#'
+#' @param fileName fileName of the output image
+#'
+#' @export
+#'
+#'
 plotLargeScaleEvent <- function(object, fileName) {
     
     samps <- object@large.scale.cnv.events
@@ -154,7 +207,19 @@ plotLargeScaleEvent <- function(object, fileName) {
     
 }
 
-
+#' @title plotBAFInSeperatePages()
+#'
+#' @description  Visualization of BAF deviation for each sample in separate pages 
+#'
+#' @param loh baf signal, user can either give smoothed baf signal or original baf signal as an input. 
+#' 
+#' @param folderName folder name for the output images  
+#'
+#' @return object
+#'
+#' @export
+#'
+#'
 plotBAFInSeperatePages <- function(loh, folderName) {
     
     dir.create(folderName)
@@ -207,7 +272,17 @@ plotBAFInSeperatePages <- function(loh, folderName) {
     }
 }
 
-
+#' @title plotBAFAllSamples()
+#'
+#' @description  Visualization of BAF shift signal for all samples together 
+#'
+#' @param loh baf signal, user can either give smoothed baf signal or original baf signal as an input. 
+#' 
+#' @param fileName fileName of the putput image
+#'
+#' @export
+#'
+#'
 plotBAFAllSamples <- function(loh, fileName) {
     
     to.plot <- NULL
@@ -232,6 +307,23 @@ plotBAFAllSamples <- function(loh, fileName) {
     ggsave(fileName, plot = p)
 }
 
+#' @title plotGEAndBAFOneSample()
+#'
+#' @description  Gene expression and BAF signal for one sample in one plot
+#'
+#' @param object casper object
+#' 
+#' @param cnv.scale expression.scale for the expression signal 
+#'
+#' @param sample sample name 
+#'
+#' @param n window length used for median filtering
+#' 
+#' @param length.iterations increase in window length at each scale iteration 
+#' 
+#' @export
+#'
+#'
 plotGEAndBAFOneSample <- function(object, cnv.scale, loh.scale, sample, n = 50, scale.iteration = 50) {
     
     row_median <- apply(object@centered.data, 2, median)
@@ -299,6 +391,19 @@ plotGEAndBAFOneSample <- function(object, cnv.scale, loh.scale, sample, n = 50, 
     ggsave(filename = paste0(sample, "_GE_BAF.png"), p)
 }
 
+#' @title plotGEAllSamples()
+#'
+#' @description  plot gene expression signal for each sample seperately
+#'
+#' @param object casper object 
+#'
+#' @param fileName fileName of the putput image
+#'
+#' @param cnv.scale  expression.scale for the expression signal  
+#'
+#' @export
+#'
+#'
 plotGEAllSamples <- function(object, fileName = fileName, cnv.scale) {
     
     row_median <- apply(object@centered.data, 2, median)
@@ -342,6 +447,17 @@ plotGEAllSamples <- function(object, fileName = fileName, cnv.scale) {
     dev.off()
 }
 
+#' @title plotBAFOneSample()
+#'
+#' @description  Visualization of BAF shift signal in different scales for one sample
+#'
+#' @param object  casper object
+#' 
+#' @param fileName fileName of the output image
+#'
+#' @export
+#'
+#'
 
 plotBAFOneSample <- function(object, fileName) {
     
@@ -379,6 +495,21 @@ plotBAFOneSample <- function(object, fileName) {
     
 }
 
+#' @title plotSingleCellLargeScaleEventHeatmap()
+#'
+#' @description  Visualization of large scale event summary for selected samples and chromosomes
+#'
+#' @param finalChrMat large scale events identified from CaSpER represented as matrix. Rows indicates samples (cells) whereas columns indicates chromosome arms
+#' 
+#' @param sampleName sample name
+#'
+#' @param chrs chromosome names
+#'
+#' @return object
+#'
+#' @export
+#'
+#'
 plotSingleCellLargeScaleEventHeatmap <- function(finalChrMat, sampleName, chrs) {
     
     title <- paste0(sampleName, "_", paste0(chrs, collapse = "_"), sep = "")
@@ -410,6 +541,15 @@ plotSingleCellLargeScaleEventHeatmap <- function(finalChrMat, sampleName, chrs) 
     
 }
 
+#' @title plotMUAndCooccurence()
+#'
+#' @description  Visualization of mutually exclusive and co-occuring events
+#'
+#' @param results output of extractMUAndCooccurence() function
+#'
+#' @export
+#'
+#'
 plotMUAndCooccurence <- function(results) {
     for (j in 1:length(results)) {
         mat <- results[[j]]
@@ -459,6 +599,19 @@ plotMUAndCooccurence <- function(results) {
     
 }
 
+#' @title plotSCellCNVTree()
+#'
+#' @description  Pyhlogenetic tree-based clustering and visualization of the cells based on the CNV events from single cell RNA-seq Data.
+#'
+#' @param finalChrMat large scale events identified from CaSpER represented as matrix. Rows indicates samples (cells) whereas columns indicates chromosome arms
+#' 
+#' @param sampleName sample name
+#'
+#' @param path path to the executable containing fitch. If path = NULL, the R will search several commonly used directories for the correct executable file. More information about installing PHYLIP can be found on the PHYLIP webpage: http://evolution.genetics.washington.edu/phylip.html.
+#'
+#' @export
+#'
+#'
 plotSCellCNVTree <- function(finalChrMat, sampleName, path = "C:\\Users\\aharmanci\\Downloads\\phylip-3.695\\phylip-3.695\\exe", 
     fileName) {
     finalChrMat <- finalChrMat[grep(sampleName, rownames(finalChrMat)), ]

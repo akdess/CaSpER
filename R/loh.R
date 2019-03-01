@@ -1,4 +1,14 @@
-
+#' @title readBAFExtractOutput()
+#'
+#' @description Reads BAFExtract output files 
+#'
+#' @param path path for the folder that contains BAFExtract output files 
+#' 
+#' @return baf signal in data.frame format 
+#'
+#' @export
+#'
+#' 
 readBAFExtractOutput <- function(path, sequencing.type = "bulk") {
     
     files <- list.files(path)
@@ -25,6 +35,17 @@ readBAFExtractOutput <- function(path, sequencing.type = "bulk") {
     return(loh)
 }
 
+#' @title lohCallMedianFilter()
+#'
+#' @description Reads BAFExtract output files 
+#'
+#' @param path path for the folder that contains BAFExtract output files 
+#' 
+#' @return baf signal in data.frame format 
+#'
+#' @export
+#'
+#' 
 lohCallMedianFilter <- function(object, loh.scale, n = 50, scale.iteration = 50) {
     
     object@loh.median.filtered.data <- list()
@@ -45,18 +66,24 @@ lohCallMedianFilter <- function(object, loh.scale, n = 50, scale.iteration = 50)
 }
 
 
-
-
+#' @title readBAFExtractOutput()
+#'
+#' @description Reads BAFExtract output files 
+#'
+#' @param path path for the folder that contains BAFExtract output files 
+#' 
+#' @return baf signal in data.frame format 
+#'
+#' @export
+#'
+#' 
 lohCallMedianFilterByChr <- function(object, loh.scale, n = 50, scale.iteration = 50) {
-    
-    ################ Center data (automatically ignores zeros) ################
-    
+        
     object@loh.median.filtered.data <- list()
     
     for (j in 1:length(object@loh)) {
         maf <- object@loh[[j]]
         data_smoothed <- maf$dev
-        # plot_LOH_WG_Unpaired (maf=maf,sample_name=sample_name, outDir=paste0('./', fileName))
         maf_temp <- maf
         for (i in 1:loh.scale) {
             
@@ -72,8 +99,6 @@ lohCallMedianFilterByChr <- function(object, loh.scale, n = 50, scale.iteration 
             }
             
             maf_temp <- maf_2
-            # plot_LOH_WG_Unpaired (maf=maf_2,sample_name=paste0(sample_name, 'before_smooth_center', '_', i), outDir=paste0('./',
-            # fileName))
             n <- n + scale.iteration
         }
         object@loh.median.filtered.data[[j]] <- maf_2

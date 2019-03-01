@@ -1,15 +1,44 @@
-
-generateParam <- function(object, scale = 4) {
-    param <- data.frame(strength = 1e+07, e = 0.9999999, mu = quantile(object@control.normalized[[scale]], na.rm = TRUE, prob = c(0.01, 
+#' @title generateParam()
+#'
+#' @description  Initial HMM parameters estimated from the data.
+#'
+#' @param object casper object
+#' 
+#' @param cnv.scale expression.scale for the expression signal 
+#' 
+#' @return object
+#'
+#' @export
+#'
+#'
+generateParam <- function(object, cnv.scale = 3) {
+    param <- data.frame(strength = 1e+07, e = 0.9999999, mu = quantile(object@control.normalized[[cnv.scale]], na.rm = TRUE, prob = c(0.01, 
         0.05, 0.5, 0.95, 0.99)), lambda = 20, nu = 2.1, kappa = c(0.05, 0.05, 0.8, 0.05, 0.05) * 1000, m = 0, eta = c(5, 5, 
         50, 5, 5) * 10000, gamma = 3, S = 0)
     param$m <- param$mu
-    param$S <- ((sd(2^object@control.normalized[[scale]], na.rm = TRUE)/sqrt(nrow(param)))^2)
+    param$S <- ((sd(2^object@control.normalized[[cnv.scale]], na.rm = TRUE)/sqrt(nrow(param)))^2)
     rownames(param) <- seq(1, 5)
     object@hmmparam <- param
     return(object)
 }
 
+#' @title runCaSpER()
+#'
+#' @description  Main casper function that performs a pairwise comparison of all scales from BAF and expression signals to ensure a coherent set of CNV calls.
+#'
+#' @param object casper object
+#' 
+#' @param removeCentromere boolean values determining if centromere regions should be removed from the analysis
+#'
+#' @param cytoband cytoband information downloaded from UCSC hg19: http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/cytoBand.txt.gz hg38:http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cytoBand.txt.gz 
+#'
+#' @param method iterative or fixed method. Fixed performs CNV calls on desired baf and expression scale whereas iterative performs pairwise comparison of all expression and baf scale pairs. Iterative method is recommendend. (default: iterative)
+#'
+#' @return list of objects
+#'
+#' @export
+#'
+#'
 runCaSpER <- function(object, removeCentromere = T, cytoband = object@cytoband, method = "iterative") {
     final.objects <- list()
     
@@ -22,8 +51,7 @@ runCaSpER <- function(object, removeCentromere = T, cytoband = object@cytoband, 
         for (i in 1:object@loh.scale) {
             loh.list[[i]] <- lohCallMedianFilterByChr(object, loh.scale = i)
         }
-        
-        
+           
         message("Performing HMM segmentation...")
         
         for (i in 1:object@cnv.scale) {
@@ -54,6 +82,101 @@ runCaSpER <- function(object, removeCentromere = T, cytoband = object@cytoband, 
     return(final.objects)
 }
 
+#' @title splitByOverlap()
+#'
+#' @description  helper function for segment summary. Acknowledgements to https://support.bioconductor.org/p/67118/
+#'
+#' @export
+#'
+#'
+splitByOverlap <-   function(query, subject, column="ENTREZID", ...)
+{
+    olaps <- findOverlaps(query, subject, ...)
+    f1 <- factor(subjectHits(olaps),
+                 levels=seq_len(subjectLength(olaps)))
+    splitAsList(mcols(query)[[column]][queryHits(olaps)], f1)
+}
+
+#' @title extractSegmentSummary()
+#'
+#' @description  generates coherent set of CNV segments using the pairwise comparison of all scales from BAF and expression signals 
+#'
+#' @param final.objects list of casper object
+#'
+#' @return list of loss and gain segments identified  in all scales
+#'
+#' @export
+#'
+#'
+extractSegmentSummary <- function(final.objects) {
+   
+    sample.ids <- as.character(unique(final.objects[[1]]@segments$ID))
+    all.summary.loss <- NULL
+    all.summary.gain <- NULL
+    
+    for (j in 1:length(sample.ids))
+    {
+        all.loss <- c()
+        all.gain <- c()
+
+        for (i in 1:length(final.objects)){
+
+            id <- names(final.objects)[i]
+            seg <- final.objects[[i]]@segments
+     
+            seg.loss <- seg[seg$ID %in% sample.ids[j] & seg$states2=="del", ]
+            gr.loss <- GRanges(seqname=as.character(seg.loss$chr), 
+                range=IRanges(start=seg.loss$start,
+                end=seg.loss$end)) 
+            gr.loss<- reduce(gr.loss)
+            all.loss <- c(all.loss, gr.loss)
+
+            seg.amp <- seg[seg$ID %in% sample.ids[j] & seg$states2=="amp", ]
+            gr.amp <- GRanges(seqname=as.character(seg.amp$chr), 
+                range=IRanges(start=seg.amp$start,
+                end=seg.amp$end)) 
+            gr.amp<- reduce(gr.amp)
+            all.gain<- c(all.gain, gr.amp)
+
+        }
+
+        if(length(all.loss)>0){
+            all.loss <-  unlist(as(all.loss, "GRangesList"))
+            bins.loss <- disjoin(sort(all.loss))
+            mcols(bins.loss)$count <- countOverlaps(bins.loss, all.loss)
+            if(length(bins.loss)>0){
+                summary.loss <- data.frame(ID=sample.ids[j], as.data.frame(bins.loss), type="Loss")
+                all.summary.loss <- rbind(all.summary.loss, summary.loss)            
+            }
+        }
+
+        if(length(all.gain)>0){
+            all.gain <-  unlist(as(all.gain, "GRangesList"))
+            bins.gain<- disjoin(sort(all.gain))
+            mcols(bins.gain)$count <- countOverlaps(bins.gain, all.gain)
+            if(length(bins.gain)>0){
+                summary.gain <- data.frame(ID=sample.ids[j], as.data.frame(bins.gain), type="Gain")
+                all.summary.gain <- rbind(all.summary.gain, summary.gain)            
+            }
+        }
+    }
+
+    return(list(all.summary.loss=all.summary.loss, all.summary.gain=all.summary.gain))
+}
+
+#' @title extractLargeScaleEvents()
+#'
+#' @description generates coherent set of large scale CNV events using the pairwise comparison of all scales from BAF and expression signals
+#'
+#' @param final.objects casper object
+#' 
+#' @param thr gamma threshold determining the least number of scales required to support 
+#'
+#' @return final large scale event summary reported as a matrix 
+#'
+#' @export
+#'
+#'
 extractLargeScaleEvents <- function(final.objects, thr = 0.5) {
     
     mergeScales <- mergeScalesAndGenerateFinalEventSummary(final.objects)
@@ -71,7 +194,17 @@ extractLargeScaleEvents <- function(final.objects, thr = 0.5) {
     return(finalChrMat)
 }
 
-
+#' @title mergeScalesAndGenerateFinalEventSummary()
+#'
+#' @description  helper function for extractLargeScaleEvents()
+#'
+#' @param final.objects list of casper objects
+#'
+#' @return list of objects
+#'
+#' @export
+#'
+#'
 mergeScalesAndGenerateFinalEventSummary <- function(final.objects) {
     sampleNames <- rownames(final.objects[[1]]@large.scale.cnv.events)
     mergeScalesAmp <- matrix(0, ncol = 44, nrow = length(sampleNames))
@@ -108,10 +241,26 @@ mergeScalesAndGenerateFinalEventSummary <- function(final.objects) {
 }
 
 
-
+#' @title PerformSegmentationWithHMM()
+#'
+#' @description  HMM segmentation applied for each scale of expression signal 
+#'
+#' @param object casper object
+#' 
+#' @param cnv.scale expression signal scale number
+#'
+#' @param removeCentromere boolean values determining if centromere regions should be removed from the analysis
+#'
+#' @param cytoband cytoband information downloaded from UCSC hg19: http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/cytoBand.txt.gz hg38:http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cytoBand.txt.gz 
+#'
+#' @return object
+#'
+#' @export
+#'
+#'
 PerformSegmentationWithHMM <- function(object, cnv.scale, removeCentromere = T, cytoband) {
     
-    object <- generateParam(object, scale = cnv.scale)
+    object <- generateParam(object, cnv.scale = cnv.scale)
     data <- object@control.normalized[[cnv.scale]]
     annotation <- object@annotation.filt
     
@@ -156,7 +305,17 @@ PerformSegmentationWithHMM <- function(object, cnv.scale, removeCentromere = T, 
     return(object)
 }
 
-
+#' @title calculateLOHShiftsForEachSegment()
+#'
+#' @description  calculate the median value of the BAF shift signal on the segments 
+#'
+#' @param object casper object
+#' 
+#' @return object
+#'
+#' @export
+#'
+#'
 calculateLOHShiftsForEachSegment <- function(object) {
     segments <- object@segments
     loh <- object@loh.median.filtered.data
@@ -195,7 +354,17 @@ calculateLOHShiftsForEachSegment <- function(object) {
     
 }
 
-
+#' @title assignStates()
+#'
+#' @description  calculates baf shift threshold using gaussian mixture models and assigns deletion or amplification to a segment when the HMM state is 1 or 5 without looking at the BAF signal. When the segment state is 2 or 4, an accompanying BAF shift on the segment is required.
+#'
+#' @param object casper object
+#' 
+#' @return object
+#'
+#' @export
+#'
+#'
 assignStates <- function(object) {
     object@loh.shift.thr <- 0.15
     X <- na.omit(as.numeric(object@segments$medianDev[object@segments$event_scale == "large_scale"]))
@@ -224,6 +393,17 @@ assignStates <- function(object) {
     return(object)
 }
 
+#' @title generateLargeScaleEvents()
+#'
+#' @description  generates large scale CNV events 
+#'
+#' @param object casper object
+#' 
+#' @return object
+#'
+#' @export
+#'
+#'
 generateLargeScaleEvents <- function(object) {
     amp <- extractEvents(segments = object@segments, cytoband = object@cytoband, type = "amp")
     del <- extractEvents(segments = object@segments, cytoband = object@cytoband, type = "del")
@@ -235,6 +415,22 @@ generateLargeScaleEvents <- function(object) {
     return(object)
 }
 
+#' @title extractEvents()
+#'
+#' @description  formats large scale events as a matrix. Rows represent  samples (cells) whereas columns represent chromosome arms (1: amplification, 0: neutral, -1: deletion) 
+#' helper function for generateLargeScaleEvents()
+#'
+#' @param object casper object
+#' 
+#' @param cytoband cytoband information downloaded from UCSC hg19: http://hgdownload.cse.ucsc.edu/goldenpath/hg19/database/cytoBand.txt.gz hg38:http://hgdownload.cse.ucsc.edu/goldenpath/hg38/database/cytoBand.txt.gz 
+#'
+#' @param type  event type amp (amplification) or del (deletion)/ 
+#'
+#' @return combined large scale events in data.frame 
+#'
+#' @export
+#'
+#'
 extractEvents <- function(segments, cytoband, type) {
     
     sample_ids <- unique(segments$ID)
@@ -287,3 +483,5 @@ extractEvents <- function(segments, cytoband, type) {
     summary_events <- cbind(result_large, result_focal, result_large_number, result_focal_number)
     return(summary_events)
 }
+
+

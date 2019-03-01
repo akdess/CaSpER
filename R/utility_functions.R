@@ -1,4 +1,16 @@
-
+#' @title calcROC()
+#'
+#' @description Calculates tpr and fpr values using genotyping array as gold standard
+#'
+#' @param chrMat large scale event matrix generated using CaSpER
+#' 
+#' @param chrMat2 large scale event matrix generated using genotyping array
+#'
+#' @return accuracy measures 
+#'
+#' @export
+#'
+#' 
 calcROC <- function(chrMat, chrMat2) {
     chrMatPos <- chrMat
     chrMatPos[chrMatPos < 0] <- 0
@@ -52,19 +64,21 @@ calcROC <- function(chrMat, chrMat2) {
     list(tpr = recall, fpr = fallout, tprAmp = recallAmp, fprAmp = falloutAmp, tprDel = recallDel, fprDel = falloutDel)
 }
 
-plotROC <- function(roc, threshold, cost_of_fp, cost_of_fn) {
-    
-    norm_vec <- function(v) (v - min(v))/diff(range(v))
-    
-    idx_threshold = which.min(abs(roc$threshold - threshold))
-    
-    col_ramp <- colorRampPalette(c("green", "orange", "red", "black"))(100)
-    col_by_cost <- col_ramp[ceiling(norm_vec(roc$cost) * 99) + 1]
-    p_roc <- ggplot(roc, aes(fpr, tpr)) + geom_line(color = rgb(0, 0, 1, alpha = 0.3)) + coord_fixed() + geom_line(aes(threshold, 
-        threshold), color = rgb(0, 0, 1, alpha = 0.5)) + labs(title = sprintf("ROC")) + xlab("FPR") + ylab("TPR") + geom_hline(yintercept = roc[idx_threshold, 
-        "tpr"], alpha = 0.5, linetype = "dashed") + geom_vline(xintercept = roc[idx_threshold, "fpr"], alpha = 0.5, linetype = "dashed")
-}
-
+#' @title extractMUAndCooccurence()
+#'
+#' @description calculates significant mutually exclusive and co-occurent events
+#'
+#' @param finalChrMat large scale event matrix generated using CaSpER
+#' 
+#' @param loh  original baf signal 
+#'
+#' @param loh.name.mapping  contains the cell (sample) name and the matching baf signal sample name
+#'
+#' @return list of mutually exclusive and co-occurent events
+#'
+#' @export
+#'
+#' 
 extractMUAndCooccurence <- function(finalChrMat, loh, loh.name.mapping) {
     results <- list()
     chrs <- colnames(finalChrMat)
@@ -201,10 +215,25 @@ extractMUAndCooccurence <- function(finalChrMat, loh, loh.name.mapping) {
     return(results)
 }
 
-
+#' @title generateAnnotation()
+#'
+#' @description retrieves gene chromosomal locations from biomart
+#'
+#' @param id_type gene list identifier, ensembl_gene_id or hgnc_symbol
+#' 
+#' @param genes  list of genes
+#'
+#' @param ishg19  boolean values determining the genome version 
+#' 
+#' @param centromere centromer regions
+#' 
+#' @return list of mutually exclusive and co-occurent events
+#'
+#' @export
+#'
+#'
 generateAnnotation <- function(id_type = "ensembl_gene_id", genes, ishg19, centromere) {
-    
-    ## generate annotation data.frame
+
     if (ishg19) {
         mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart = "ensembl", GRCh = 37))
     } else {
@@ -242,9 +271,27 @@ generateAnnotation <- function(id_type = "ensembl_gene_id", genes, ishg19, centr
     
 }
 
-
-go.enrichment.BP<-function (genes, ontology, universe=character(0),  
-        pvalue=0.05, annotation='org.Hs.eg.db', conditionalSearch=TRUE,genes2)
+#' @title goEnrichmentBP()
+#'
+#' @description GO Term enrichment 
+#'
+#' @param genes list of genes
+#' 
+#' @param ontology  ontology  (BP, CC or MF) 
+#'
+#' @param universe  universe of genes
+#' 
+#' @param pvalue pvalue cutoff
+#' 
+#' @param annotation ontology annotation default:org.Hs.eg.db
+#' 
+#' @return significantly enriched GO Terms
+#'
+#' @export
+#'
+#'
+goEnrichmentBP<-function (genes, ontology, universe=character(0),  
+        pvalue=0.05, annotation='org.Hs.eg.db', conditionalSearch=TRUE, genes2)
 {
     
     params = new ("GOHyperGParams", geneIds=unique(genes),  ontology="BP",  
@@ -267,8 +314,23 @@ go.enrichment.BP<-function (genes, ontology, universe=character(0),
     return (sum)
 }
 
-
-
+#' @title getDiffExprGenes()
+#'
+#' @description get differentially expressed genes between samples having selected specified CNV events
+#'
+#' @param final.objects list of objects
+#' 
+#' @param sampleName  sample name
+#'
+#' @param chrs  selected chromosomes
+#' 
+#' @param event.type cnv event type
+#' 
+#' @return differentially expressed genes
+#'
+#' @export
+#'
+#'
 getDiffExprGenes <- function(final.objects, sampleName, chrs, event.type)
 {
     finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 
@@ -310,33 +372,67 @@ getDiffExprGenes <- function(final.objects, sampleName, chrs, event.type)
     
 }
 
+#' @title generateEnrichmentSummary()
+#'
+#' @description generate GO Term enrichment summary 
+#'
+#' @param results output of getDiffExprGenes() function
+#' 
+#' @return significantly enriched GO Terms
+#'
+#' @export
+#'
+#'
 generateEnrichmentSummary <- function(results)
 {
     genes <- as.character(results$ID[results$adj.P.Val<0.05])
     entrez.id <-as.vector(unique(na.omit(unlist(mget (genes,org.Hs.egALIAS2EG,ifnotfound=NA)))))
     universe.id <- as.vector(unique(na.omit(unlist(as.list(org.Hs.egALIAS2EG)))))
-    go.BP<-go.enrichment.BP(genes=entrez.id , ontology="BP",universe=universe.id,  
+    go.BP<-goEnrichmentBP(genes=entrez.id , ontology="BP",universe=universe.id,  
             pvalue=0.01, annotation='org.Hs.eg.db', conditionalSearch=TRUE, genes2=genes)
     return(go.BP)
-    #write.xlsx(results, file=fileName, sheetName="sheet1", row.names=FALSE)
-    ##write.xlsx(go.BP, go.BP, go.BP), file=fileName, sheetName="sheet2", append=TRUE, row.names=FALSE)
-    #write.xlsx(go.MF, file=fileName, sheetName="sheet3", append=TRUE, row.names=FALSE)
-    #write.xlsx(kegg, file=fileName, sheetName="sheet4", append=TRUE, row.names=FALSE)
 }
 
-# finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 
-# group1 <- names(which(finalChrMat[grep(sampleName, rownames(finalChrMat)),chrs[1]] == event.type[1]))
-# group2 <- names(which(finalChrMat[grep(sampleName, rownames(finalChrMat)),chrs[2]] == event.type[2]))
-# common <- intersect(group1, group2)
-# group1 <- group1[!(group1 %in% common)]
-# group2 <- group2[!(group2 %in% common)]  
-# data <- final.objects[[1]]@data
-
-# p_val <- sapply(X = 1:nrow(x = data), FUN = function(x) {
-#     return(wilcox.test(as.numeric(data[x, colnames(data) %in% group1]),as.numeric(data[x, colnames(data) %in% group2] ))$p.value)
-# })
-
-# genes.return <- rownames(x = data)
-# to.return <- data.frame(p_val, adj.Pval=p.adjust(p_val, method="fdr"), row.names = genes.return)
-# to.return[to.return$adj.Pval<0.05, ]
-# na.omit(rownames(to.return)[to.return$adj.Pval<0.05])
+#' @title gene.matrix()
+#'
+#' @description Gene level CNV events represented as matrix where rows represent samples and columns represent samples
+#'
+#' @param segment CNV segments
+#' 
+#' @param all.genes  gene names
+#'
+#' @param all.samples  samp names
+#' 
+#' @param genes.ann gene symbols within each segments
+#' 
+#' @return matrix of gene level CNV events
+#'
+#' @export
+gene.matrix <- function(segment, all.genes, all.samples, genes.ann){
+  
+  CN<-matrix(0,nrow=length(all.samples),ncol=length(all.genes))
+  rownames(CN)<-all.samples
+  colnames(CN)<-all.genes
+  
+  for (i in 1:length(rownames(CN))){
+    
+    ampSegments<-which(rownames(CN)[i]==segment$ID & segment$type=="Gain")
+    lossSegments<-which(rownames(CN)[i]==segment$ID & (segment$type=="Loss"))
+    
+    ampGenes<-unique(unlist(sapply(ampSegments,function(x) unique(genes.ann[[x]]))))
+    lossGenes<-unique(unlist(sapply(lossSegments,function(x) unique(genes.ann[[x]]))))
+    
+     if(length(ampGenes)>0){
+      m<-match(ampGenes,colnames(CN))
+      CN[i,m]<-1
+    }
+    if(length(lossGenes)>0){
+      m<-match(lossGenes,colnames(CN))
+      CN[i,m]<-(-1)
+    }
+    
+  }
+  
+  CN<-t(CN)
+  CN
+}
