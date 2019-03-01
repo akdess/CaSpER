@@ -46,14 +46,48 @@ order.sampleNames <- c("MN-1171",  "MN-60835" ,"MN-1236" , "MN-1237" , "MN-1137"
 obj <- final.objects[[9]]
 plotHeatmap(object=obj, fileName="heatmap.png",cnv.scale= 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T)
 
-## summarize large scale events 
+##  large scale event summary
 finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 
 common <- intersect(order.sampleNames, intersect(rownames(finalChrMat), rownames(genoMat)))
 finalChrMat <- finalChrMat[match(common, rownames(finalChrMat)), ]
 genoMat <- genoMat[match(common, rownames(genoMat)), ]
-    
+
 ## calculate TPR and FPR using genotyping array as gold standard
 calcROC(chrMat=finalChrMat, chrMat2=genoMat)
+
+## segment based summary    
+gamma <- 6
+all.segments <- do.call(rbind, lapply(final.objects, function(x) x@segments))
+segment.summary <- extractSegmentSummary (final.objects)
+loss <- segment.summary$all.summary.loss
+gain <- segment.summary$all.summary.gain
+loss.final <- loss[loss$count>=gamma, ]
+gain.final <- gain[gain$count>=gamma, ]
+
+## gene based summary 
+all.summary<- rbind(loss.final, gain.final)
+colnames(all.summary) [2:4] <- c("Chromosome", "Start",   "End")
+rna <-  GRanges(seqnames = Rle(gsub("q", "", gsub("p", "", all.summary$Chromosome))), 
+    IRanges(all.summary$Start, all.summary$End))   
+ann.gr <- makeGRangesFromDataFrame(final.objects[[1]]@annotation.filt, keep.extra.columns = TRUE, seqnames.field="Chr")
+hits <- findOverlaps(geno.rna, ann.gr)
+genes <- splitByOverlap(ann.gr, geno.rna, "GeneSymbol")
+genes.ann <- lapply(genes, function(x) x[!(x=="")])
+all.genes <- unique(final.objects[[1]]@annotation.filt[,2])
+all.samples <- unique(as.character(final.objects[[1]]@segments$ID))
+rna.matrix <- gene.matrix(seg=all.summary, all.genes=all.genes, all.samples=all.samples, genes.ann=genes.ann)
+
+## genotyping array gene based summary
+segments <- yale_meningioma$segments
+segments$type<- segments$Type_Corrected
+geno.gr <-  GRanges(seqnames = Rle(gsub("q", "", gsub("p", "", segments$chr))), IRanges(segments$start, segments$end))   
+hits <- findOverlaps(geno.gr, ann.gr)
+genes <- splitByOverlap(ann.gr, geno.gr, "GeneSymbol")
+genes.ann <- lapply(genes, function(x) x[!(x=="")])
+gt.matrix <- gene.matrix(seg=segments, all.samples=all.samples, all.genes=all.genes, genes.ann=genes.ann)
+
+## calculate TPR and FPR using genotyping array as gold standard
+calcROC(chrMat=rna.matrix, chrMat2=gt.matrix)
 
 #### VISUALIZATION 
 
