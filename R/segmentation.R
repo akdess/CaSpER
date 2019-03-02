@@ -113,12 +113,12 @@ extractSegmentSummary <- function(final.objects) {
     sample.ids <- as.character(unique(final.objects[[1]]@segments$ID))
     all.summary.loss <- NULL
     all.summary.gain <- NULL
-    
+    all.summary.loh <- NULL
     for (j in 1:length(sample.ids))
     {
         all.loss <- c()
         all.gain <- c()
-
+        all.cnloh <- c()
         for (i in 1:length(final.objects)){
 
             id <- names(final.objects)[i]
@@ -137,6 +137,13 @@ extractSegmentSummary <- function(final.objects) {
                 end=seg.amp$end)) 
             gr.amp<- reduce(gr.amp)
             all.gain<- c(all.gain, gr.amp)
+
+            seg.loh <- seg[seg$ID %in% sample.ids[j] & seg$states2=="cnloh", ]
+            gr.loh <- GRanges(seqname=as.character(seg.loh$chr), 
+                range=IRanges(start=seg.loh$start,
+                end=seg.loh$end)) 
+            gr.loh<- reduce(gr.loh)
+            all.cnloh<- c(all.cnloh, gr.loh)
 
         }
 
@@ -159,9 +166,19 @@ extractSegmentSummary <- function(final.objects) {
                 all.summary.gain <- rbind(all.summary.gain, summary.gain)            
             }
         }
+
+        if(length(all.cnloh)>0){
+            all.cnloh <-  unlist(as(all.cnloh, "GRangesList"))
+            bins.loh<- disjoin(sort(all.cnloh))
+            mcols(bins.loh)$count <- countOverlaps(bins.loh, all.cnloh)
+            if(length(bins.loh)>0){
+                summary.loh <- data.frame(ID=sample.ids[j], as.data.frame(bins.loh), type="CNLOH")
+                all.summary.loh <- rbind(all.summary.loh, summary.loh)            
+            }
+        }
     }
 
-    return(list(all.summary.loss=all.summary.loss, all.summary.gain=all.summary.gain))
+    return(list(all.summary.loss=all.summary.loss, all.summary.gain=all.summary.gain, all.summary.loh=all.summary.loh))
 }
 
 #' @title extractLargeScaleEvents()
@@ -390,6 +407,8 @@ assignStates <- function(object) {
     object@segments$states2[as.numeric(as.character(object@segments$state)) == 2 & object@segments$medianDev > object@loh.shift.thr] <- "del"
     object@segments$states2[as.numeric(as.character(object@segments$state)) == 4 & object@segments$medianDev > object@loh.shift.thr] <- "amp"
     
+    object@segments$states2[as.numeric(as.character(object@segments$state)) == 3 & object@segments$medianDev > object@loh.shift.thr] <- "cnloh"
+   
     return(object)
 }
 

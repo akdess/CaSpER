@@ -3,7 +3,7 @@
 title: "CaSpER: Identification, visualization and integrative analysis of CNV events in multiscale resolution using single-cell or bulk RNA sequencing data"
 author: "Akdes Serin Harmanci, Arif O. Harmanci"
 date: "`r Sys.Date()`"
-output: pdf_document
+output: html_document
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -171,20 +171,20 @@ object <- CreateCasperObject(raw.data=data,loh.name.mapping=loh.name.mapping, se
 
 Above CaSpER object  stores all information associated with the dataset, including expression data, smoothed expression data in n (default:3) different scales, original baf signal, smoothed baf signal,  annotations, control sample ids.
 
-loh.name.mapping:  data frame  contains the sample id mappings between expression signal and baf signal. For bulk sequencing data there will be one to one mapping since baf signal is generated for all samples seperately. 
+loh.name.mapping: contains the sample id mappings between expression signal and baf signal. For bulk sequencing data there will be one to one mapping since baf signal is generated for all samples seperately. 
 
 ```{r, eval=T}
 kable(yale_meningioma$loh.name.mapping[1:5, ])
 ```
 
-However, in single-cell sequencing data there will be one to multiple mapping since baf signal is generated after pooling all the cells coming from the same patient. control.sample.ids is the vector of control samples.
+However, in single-cell sequencing data there will be one to multiple mapping since baf signal is generated after pooling all the cells coming from the same patient. 
 
 ```{r, eval=T}
 data("scell_gbm")
 kable(scell_gbm$loh.name.mapping[1:5, ])
 ```
 
-
+control.sample.ids is the vector of control samples.
 
 **2. Pairwise comparison of scales from BAF and expression signals** 
 
@@ -195,7 +195,7 @@ final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method
 ```
 
 ```{r include=FALSE}
-load("C:\\Users\\aharmanci\\Google Drive\\uthealth\\SCell_ProcessedData\\TCGA\\final.objects.yale.mn.rda")
+load("final.objects.yale.mn.rda")
 ```
 
 **3. Harmonization and Summarization of CNV calls from multiple scales and from multiple pairwise comparison of BAF and Expression Signals**
@@ -213,6 +213,7 @@ finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75)
 
 
 b. Segment based CNV Summarization. 
+
 The segments-based summarization aims at generating a final set of CNV calls for a final set of segments that are computed by comparison of scales. We first compare the segments from different expression scales and generate the consistent set of segments. For each segment in the final set, if there are more than γ (default=6) consistent CNV calls among N×M CNV calls, we assign the consistent CNV call to segment. When there is no consistency among the calls, we assign a neutral CNV state to segment.
 
 ```{r, eval=F}
@@ -221,8 +222,10 @@ all.segments <- do.call(rbind, lapply(final.objects, function(x) x@segments))
 segment.summary <- extractSegmentSummary (final.objects)
 loss <- segment.summary$all.summary.loss
 gain <- segment.summary$all.summary.gain
-loss.final <- loss[loss$count>=gamma, ]
-gain.final <- gain[gain$count>=gamma, ]
+loh <- segment.summary$all.summary.loh
+loss.final <- loss[loss$count>gamma, ]
+gain.final <- gain[gain$count>gamma, ]
+loh.final <- loh[loh$count>gamma, ]
 ``` 
 
 c. Gene based CNV Summarization. 
@@ -256,37 +259,37 @@ plotHeatmap(object=obj, fileName="heatmap.png",cnv.scale= 3, cluster_cols = F, c
 ```
  
 ```{r, echo=FALSE, out.width = '50%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\test.png")
+knitr::include_graphics("test.png")
 ```
 
-b. plotLargeScaleEvent: Visualization of the large-scale CNV events among all the samples/cells
+b. plotLargeScaleEvent: Visualization of the large-scale CNV events among all the samples/cells.
 Large scale event summarization is useful for summarizing the detected large-scale CNV events (deletions and amplifications) over multiple samples. This plot summarizes the large scale CNVs and may reveal the patterns that may otherwise be missed when data is visualized at smaller scales.
 
 ```{r, eval=F}
 plotLargeScaleEvent (object=obj, fileName="large.scale.events.png") 
 ``` 
 ```{r, echo=FALSE, out.width = '50%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\large.scale.events.png")
+knitr::include_graphics("large.scale.events.png")
 ```
 
-c. plotGEAndGT: Plot large scale events called from genotyping and Rna-Seq (can be used only with small sample size)
+c. plotGEAndGT: Plot large scale events called from genotyping and RNA-Seq (can be used only with small sample size)
 
 ```{r, eval=F}
 plotGEAndGT (chrMat=finalChrMat, genoMat=genoMat, fileName="RNASeqAndGT.png")
 ``` 
 ```{r, echo=FALSE, out.width = '50%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\RNASeqAndGT.png")
+knitr::include_graphics("RNASeqAndGT.png")
 ```
 
-c. plotBAFAllSamples: Visualization of BAF shift signal for all samples together 
-The inspection of BAF shift signal is useful especially when compared to the expression signal to analyze the CNV and LOH events. inferCNV does not provide any visualizations regarding the genomewide BAF shift signal and we believe that this visualization can enable a more comprehensive analysis of the above-mentioned events. The BAF shift plots show the BAF shift signal such that each row is the genomewide BAF shift signal profile. An example is included below for reference.
+c. plotBAFAllSamples: Visualization of BAF shift signal for all samples together. 
+The inspection of BAF shift signal is useful especially when compared to the expression signal to analyze the CNV and LOH events. The BAF shift plots show the BAF shift signal such that each row is the genomewide BAF shift signal profile. 
 
 ```{r, eval=F}
 plotBAFAllSamples (loh = obj@loh.median.filtered.data,  fileName="LOHAllSamples.png") 
 ``` 
 
 ```{r, echo=FALSE, out.width = '50%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\LOHAllSamples.png")
+knitr::include_graphics("LOHAllSamples.png")
 ```
 
 d. plotBAFOneSample: plotBAFOneSample: Visualization of BAF shift signal in different scales for one sample.
@@ -297,41 +300,41 @@ plotBAFOneSample (object, fileName="LOHPlotsAllScales.pdf")
 ``` 
 
 ```{r, echo=FALSE, out.width = '50%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\MN-60.png")
+knitr::include_graphics("MN-60.png")
 ```
 
-e. plotBAFInSeperatePages: Visualization of BAF deviation for each sample in separate pages. This option creates the BAF shift signal for each sample separately. This way the user can visualize each sample by itself. An example is shown below.
+e. plotBAFInSeperatePages: Visualization of BAF deviation for each sample in separate pages. This option creates the BAF shift signal for each sample separately. This way the user can visualize each sample by itself. 
 
 ```{r, eval=F}
 plotBAFInSeperatePages (loh=obj@loh.median.filtered.data, folderName="LOHPlots") 
 ```
 
 ```{r, echo=FALSE, out.width = '50%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\MN-5.png")
+knitr::include_graphics("MN-5.png")
 ```
 
-f. plotGEAndBAFOneSample: Gene expression and BAF signal for one sample in one plot. This option generates the visualization of the gene expression signal and BAF shift signal together so that the user can jointly assess them in one page. An example figure is included below. This plot shows the original data and the smoothed data for all the scales to include a complete visualization of the multiscale decomposition.
+f. plotGEAndBAFOneSample: Gene expression and BAF signal for one sample in one plot. This option generates the visualization of the gene expression signal and BAF shift signal together so that the user can jointly assess them in one page.
 
 ```{r, eval=F}
 plotGEAndBAFOneSample (object=obj, cnv.scale=3, loh.scale=3, sample= "MN-5")
 ```
 
 ```{r, echo=FALSE,  out.width = '50%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\MN-5_GE_BAF.png")
+knitr::include_graphics("MN-5_GE_BAF.png")
 ```
 
 **Visualization options specific for single-cell RNA-Seq data **
-g. plotSingleCellLargeScaleEventHeatmap: Visualization of large scale event summary for selected samples and chromosomes
+g. plotSingleCellLargeScaleEventHeatmap: Visualization of large scale event summary for selected samples and chromosomes.
 This option generates a heatmap view of only the detected large-scale CNV events over all samples. In this plot, the rows correspond to the samples and columns correspond to the detected large scale CNV events. This plot aims at providing the user with a way to visually inspect the large-scale event summaries, i.e. co-occurrence and exclusivity patterns. An example of this heatmap is shown below.
 
 ```{r, eval=F}
 plotSingleCellLargeScaleEventHeatmap(finalChrMat, sampleName="MGH31", chrs=c("5p", "14q"))
 ```
 ```{r, echo=FALSE,  out.width = '10%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\mgh31_ls.png")
+knitr::include_graphics("mgh31_ls.png")
 ```
 
-h. plotMUAndCooccurence: Visualization of mutually exclusive and co-occuring events
+h. plotMUAndCooccurence: Visualization of mutually exclusive and co-occuring events.
 
 ```{r, eval=F}
 ## calculate significant mutual exclusive and co-occurent events
@@ -341,20 +344,19 @@ plotMUAndCooccurence (results)
 
 ```
 ```{r, echo=FALSE,  out.width = '50%'}
-knitr::include_graphics("C:\\Users\\aharmanci\\Google Drive\\uthealth\\reports\\manuscripts\\casper_revision\\MGH30network.png")
+knitr::include_graphics("MGH30network.png")
 ```
 
-i. plotSCellCNVTree: Pyhlogenetic tree-based clustering and visualization of the cells based on the CNV events from single cell RNA-seq Data
-
+i. plotSCellCNVTree: Pyhlogenetic tree-based clustering and visualization of the cells based on the CNV events from single cell RNA-seq Data.
 
 
 Tutorials
 ----------
 
-1. [Yale meningioma Bulk RNA-Seq dataset](/demo/meningioma.R)
-2. [TCGA-GBM Bulk RNA-Seq dataset](/demo/tcga_GBM.R)
-2. [TCGA-BRCA Bulk RNA-Seq dataset](/demo/tcga_BRCA.R)
-3. [GBM Single-cell RNA-Seq dataset](/demo/sCellGBM.R)
+1. [Yale meningioma Bulk RNA-Seq dataset](https://github.com/akdess/CaSpER/blob/master/demo/meningioma.R)
+2. [TCGA-GBM Bulk RNA-Seq dataset](https://github.com/akdess/CaSpER/blob/master/demo/tcga_GBM.R)
+2. [TCGA-BRCA Bulk RNA-Seq dataset](https://github.com/akdess/CaSpER/blob/master/demo/tcga_BRCA.R)
+3. [GBM Single-cell RNA-Seq dataset](https://github.com/akdess/CaSpER/blob/master/demo/sCellGBM.R)
 
 
 Each run generally takes about 5-20 minutes. 

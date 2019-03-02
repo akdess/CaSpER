@@ -57,13 +57,16 @@ calcROC(chrMat=finalChrMat, chrMat2=genoMat)
 
 ## segment based summary    
 library(GenomicRanges)
-gamma <- 6
+gamma <- 7
 all.segments <- do.call(rbind, lapply(final.objects, function(x) x@segments))
 segment.summary <- extractSegmentSummary (final.objects)
 loss <- segment.summary$all.summary.loss
 gain <- segment.summary$all.summary.gain
+loh <- segment.summary$all.summary.loh
+
 loss.final <- loss[loss$count>=gamma, ]
 gain.final <- gain[gain$count>=gamma, ]
+loh.final <- loh[loh$count>=gamma, ]
 
 ## gene based summary 
 all.summary<- rbind(loss.final, gain.final)
