@@ -1,5 +1,6 @@
  CaSpER documentation is in this [Rmd](http://rpubs.com/akdess/472217).
-
+ 
+ BAFExtract code is available [here](https://github.com/akdess/BAFExtract).
 
 Tutorials
 ----------
