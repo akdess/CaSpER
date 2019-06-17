@@ -1,7 +1,5 @@
-Introduction
-----------
 
-CaSpER documentation is [here](http://rpubs.com/akdess/472217).
+CaSpER documentation is [here: RMD file](http://rpubs.com/akdess/472217).
  
 BAFExtract code is available [here](https://github.com/akdess/BAFExtract).
 
