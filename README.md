@@ -14,7 +14,7 @@ Tutorials
 2. TCGA-GBM Bulk RNA-Seq dataset [Rmd file](http://rpubs.com/akdes/505837) 
 [R code](https://github.com/akdess/CaSpER/blob/master/demo/tcga_GBM.R)
 
-3. TCGA-BRCA Bulk RNA-Seq dataset [Rmd file] (http://rpubs.com/akdes/505839) 
+3. TCGA-BRCA Bulk RNA-Seq dataset [Rmd file](http://rpubs.com/akdes/505839) 
 [R code](https://github.com/akdess/CaSpER/blob/master/demo/tcga_BRCA.R)
 
 4. GBM Single-cell RNA-Seq dataset [Rmd file](http://rpubs.com/akdes/505838)
