@@ -6,7 +6,7 @@ library(CaSpER)
 ## loh.name.mapping: data.frame for mapping loh files to expression files
 ## annotation
 ## loh 
-data("sCell_gbm")
+data("scell_gbm")
 
 data <- scell_gbm$data
 loh <-  scell_gbm$loh
