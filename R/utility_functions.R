@@ -240,7 +240,7 @@ generateAnnotation <- function(id_type = "ensembl_gene_id", genes, ishg19, centr
         mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart = "ensembl"))
     }
     
-    G_list <- getBM(filters = id_type, attributes = c(id_type, "hgnc_symbol", "entrezgene", "chromosome_name", "start_position", "end_position", 
+    G_list <- getBM(filters = id_type, attributes = c(id_type, "hgnc_symbol", "chromosome_name", "start_position", "end_position", 
         "band"), values = genes, mart = mart)
     common <- intersect(genes, G_list[, id_type])
     ord <- match(common, G_list[, id_type])
@@ -253,7 +253,7 @@ generateAnnotation <- function(id_type = "ensembl_gene_id", genes, ishg19, centr
         x)))))))
     annotation <- as.data.frame(annotation[idx, ])
     
-    colnames(annotation)[c(1:6, 8)] <- c("Gene", "GeneSymbol", "EntrezID", "Chr", "start", "end", "cytoband")
+    colnames(annotation)[c(1:5, 7)] <- c("Gene", "GeneSymbol",  "Chr", "start", "end", "cytoband")
     
     annotation$isCentromer <- rep("no", nrow(annotation))
     
