@@ -18,5 +18,8 @@ Tutorials
 4. GBM Single-cell RNA-Seq dataset [Rmd file](http://rpubs.com/akdes/505838)
 [R code](https://github.com/akdess/CaSpER/blob/master/demo/sCellGBM.R)
 
+5. 10x Single-cell RNA-Seq dataset [Rmd file](http://rpubs.com/akdes/531461)
+[R code](https://github.com/akdess/CaSpER/blob/master/demo/MM135_10X.R)
+
 Each run generally takes about 5-30 minutes. 
 
