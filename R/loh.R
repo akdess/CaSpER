@@ -49,14 +49,16 @@ readBAFExtractOutput <- function(path, sequencing.type = "bulk") {
 lohCallMedianFilter <- function(object, loh.scale, n = 50, scale.iteration = 50) {
     
     object@loh.median.filtered.data <- list()
+
     for (j in 1:length(object@loh)) {
+        window <- n
         maf <- object@loh[[j]]
         data_smoothed <- maf$dev
         for (i in 1:loh.scale) {
-            print(n)
-            data_smoothed <- round(signal::filter(MedianFilter(n + 1), data_smoothed), digits = 2)
+            print(window)
+            data_smoothed <- round(signal::filter(MedianFilter(window + 1), data_smoothed), digits = 2)
             maf$dev <- data_smoothed
-            n <- n + scale.iteration
+            window <- window + scale.iteration
         }
         object@loh.median.filtered.data[[j]] <- maf
     }
@@ -82,6 +84,7 @@ lohCallMedianFilterByChr <- function(object, loh.scale, n = 50, scale.iteration 
     object@loh.median.filtered.data <- list()
     
     for (j in 1:length(object@loh)) {
+        window <- n
         maf <- object@loh[[j]]
         data_smoothed <- maf$dev
         maf_temp <- maf
@@ -92,14 +95,14 @@ lohCallMedianFilterByChr <- function(object, loh.scale, n = 50, scale.iteration 
                 chrBAF <- maf_temp[which(as.character(maf_temp$chr) == as.character(m)), ]
                 chrBAF <- chrBAF[order(as.numeric(as.character(chrBAF$pos))), ]
                 data_smoothed <- chrBAF$dev
-                data_smoothed <- round(signal::filter(MedianFilter(n + 1), data_smoothed), digits = 2)
+                data_smoothed <- round(signal::filter(MedianFilter(window + 1), data_smoothed), digits = 2)
                 chrBAF$dev <- data_smoothed
                 maf_2 <- rbind(maf_2, chrBAF)
                 
             }
             
             maf_temp <- maf_2
-            n <- n + scale.iteration
+            window <- window + scale.iteration
         }
         object@loh.median.filtered.data[[j]] <- maf_2
     }
