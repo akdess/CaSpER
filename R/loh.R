@@ -12,7 +12,7 @@
 readBAFExtractOutput <- function(path, sequencing.type = "bulk", suffix = "snp") {
     
     files <- list.files(path)
-    files <- files[grep(".", suffix,"$", files)]
+    files <- files[grep(paste0(".", suffix,"$"), files)]
     
     
     loh <- list()
