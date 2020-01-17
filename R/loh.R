@@ -9,10 +9,10 @@
 #' @export
 #'
 #' 
-readBAFExtractOutput <- function(path, sequencing.type = "bulk") {
+readBAFExtractOutput <- function(path, sequencing.type = "bulk", suffix = "snp") {
     
     files <- list.files(path)
-    files <- files[grep(".snp$", files)]
+    files <- files[grep(".", suffix,"$", files)]
     
     
     loh <- list()
