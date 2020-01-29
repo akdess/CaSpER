@@ -1,3 +1,4 @@
+CaSpER is published in Nature Communications: https://www.nature.com/articles/s41467-019-13779-x 
 
 CaSpER documentation is [here: RMD file](http://rpubs.com/akdess/472217).
  
