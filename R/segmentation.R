@@ -295,7 +295,6 @@ PerformSegmentationWithHMM <- function(object, cnv.scale, removeCentromere = T, 
     for (i in 1:dim(data)[2]) {
         rdata <- RangedData(IRanges(start = annotation$start, end = annotation$end), space = annotation$cytoband, copy = data[, 
             i])
-        rdata <- data.frame(rdata)
         hmm.segments <- HMMsegment(rdata, param = object@hmmparam, verbose = F)
         segments <- rbind(segments, data.frame(ID = colnames(data)[i], hmm.segments$segs))
     }
