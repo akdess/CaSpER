@@ -1,6 +1,6 @@
 
 library(CaSpER)
-## "yale_meningioma_data.rda" contains the following objects: 
+## "yale_meningioma.rda" contains the following objects: 
 ## data: normalized gene expression matrix
 ## loh.name.mapping: data.frame for mapping loh files to expression files
 ## annotation
