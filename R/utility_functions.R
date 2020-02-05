@@ -232,12 +232,12 @@ extractMUAndCooccurence <- function(finalChrMat, loh, loh.name.mapping) {
 #' @export
 #'
 #'
-generateAnnotation <- function(id_type = "ensembl_gene_id", genes, ishg19, centromere) {
+generateAnnotation <- function(id_type = "ensembl_gene_id", genes, ishg19, centromere, host="www.ensembl.org") {
 
     if (ishg19) {
-        mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart = "ensembl", GRCh = 37))
+        mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart = "ensembl", GRCh = 37, host = host))
     } else {
-        mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart = "ensembl"))
+        mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart = "ensembl", host = host))
     }
     
     G_list <- getBM(filters = id_type, attributes = c(id_type, "hgnc_symbol", "chromosome_name", "start_position", "end_position", 
