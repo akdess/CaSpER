@@ -23,7 +23,7 @@ samps <-  yale_meningioma$samps
 
 ## generate annotation data.frame
 #curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz" | gunzip -c | grep acen | head
-annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(data), ishg19=T, centromere)
+annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(data), ishg19=T, centromere,host="uswest.ensembl.org")
 data <- data[match( annotation$Gene,rownames(data)), ]
 
 ## read BAF extract output  
@@ -32,9 +32,10 @@ data <- data[match( annotation$Gene,rownames(data)), ]
 
 ## create CaSpER object 
 object <- CreateCasperObject(raw.data=data,loh.name.mapping=loh.name.mapping, sequencing.type="bulk", 
-  cnv.scale=3, loh.scale=3,
-  annotation=annotation, method="iterative", loh=loh, 
+  cnv.scale=3, loh.scale=3, matrix.type="normalized", expr.cutoff=4.5,
+  annotation=annotation, method="iterative", loh=loh, filter="median", 
   control.sample.ids=control.sample.ids, cytoband=cytoband)
+
 
 ## runCaSpER
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")

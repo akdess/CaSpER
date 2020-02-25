@@ -31,9 +31,16 @@ data <- data[match( annotation$Gene,rownames(data)), ]
 
 object <- CreateCasperObject(raw.data=data, loh.name.mapping=loh.name.mapping, 
     sequencing.type="bulk", cnv.scale=3, loh.scale=3,method="iterative",
-              annotation=annotation, loh=loh, 
+              annotation=annotation, loh=loh, matrix.type="normalized", expr.cutoff=1,
               control.sample.ids=control.sample.ids, cytoband=cytoband)
 
+
+
+
+pdf("TCGA_GBM.Distrubution.pdf")
+plot(density(as.vector(object@control.normalized[[3]])))
+plot(density(log2(object@control.normalized.noiseRemoved[[3]]+1)))
+dev.off()
 ## runCaSpER
 ## this might take some time
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")

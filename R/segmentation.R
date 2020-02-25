@@ -279,7 +279,7 @@ PerformSegmentationWithHMM <- function(object, cnv.scale, removeCentromere = T, 
     
     object <- generateParam(object, cnv.scale = cnv.scale)
     data <- object@control.normalized[[cnv.scale]]
-    annotation <- object@annotation.filt
+    annotation <- object@annotation.filt[]
     
     if (removeCentromere) {
         isCentromer <- annotation$isCentromer == "no"
@@ -287,15 +287,19 @@ PerformSegmentationWithHMM <- function(object, cnv.scale, removeCentromere = T, 
         annotation <- annotation[isCentromer, ]
     }
     
-    filt <- annotation$cytoband %in% names(which(table(annotation$cytoband) > 1))
-    annotation <- annotation[filt, ]
-    data <- data[filt, ]
+    indices <- annotation$cytoband %in% names(which(table(annotation$cytoband) > 1))
+    annotation <- annotation[indices, , drop = FALSE]
+    data <- data[indices, , drop = FALSE]
     
     segments <- NULL
     for (i in 1:dim(data)[2]) {
-        rdata <- RangedData(IRanges(start = annotation$start, end = annotation$end), space = annotation$cytoband, copy = data[, 
-            i])
-        hmm.segments <- HMMsegment(rdata, param = object@hmmparam, verbose = F)
+        rdata <- GRanges(ranges=IRanges(start = annotation$start,
+            end = annotation$end), seqnames = annotation$cytoband,
+            copy = data[, i], chr=annotation$cytoband ,  space=annotation$cytoband)
+        rdata <- data.frame(rdata)
+        rdata$chr <- as.factor(rdata$chr)
+
+        hmm.segments <- HMMsegment(correctOut=rdata, param = object@hmmparam, verbose = F)
         segments <- rbind(segments, data.frame(ID = colnames(data)[i], hmm.segments$segs))
     }
     

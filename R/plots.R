@@ -62,6 +62,43 @@ draw_matrix2 <- function(matrix, border_color, gaps_rows, gaps_cols, fmat, fonts
 #' @export
 #'
 #'
+plotHeatmap10x <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
+    
+    assignInNamespace(x = "draw_matrix", value = draw_matrix2, ns = asNamespace("pheatmap"))
+    assignInNamespace(x = "draw_colnames", value = "draw_colnames_45", ns = asNamespace("pheatmap"))
+    
+     
+    data <- object@control.normalized.noiseRemoved[[cnv.scale]]
+
+    x.center <- mean(data)
+    quantiles = quantile(data[data != x.center], c(0.01, 0.99))
+
+    delta = max( abs( c(x.center - quantiles[1],  quantiles[2] - x.center) ) )
+    low_threshold = x.center - delta
+    high_threshold = x.center + delta
+    x.range = c(low_threshold, high_threshold)
+
+    data[data < low_threshold] <- low_threshold
+    data[data > high_threshold] <- high_threshold
+
+    breaks <- seq(x.range[1], x.range[2], length=16)
+      #  breaks <- seq(0, 2, length=16)
+    color <- colorRampPalette(rev(brewer.pal(11, "RdYlBu")))(length(breaks))
+    
+    idx <- cumsum(table(object@annotation.filt$Chr)[as.character(1:22)])
+    xlabel <- rep("", length(rownames(object@data)))
+    half <- round(table(object@annotation.filt$Chr)[as.character(1:22)]/2)[-1]
+    xpos <- c(half[1], (idx[-22] + half))
+    xlabel[xpos] <- 1:22
+   
+    if (only_soi) 
+        data <- data[, !(colnames(data) %in% object@control.sample.ids)]
+    
+    pheatmap(t(data), cluster_cols = F, cluster_rows = T, gaps_col = idx, color = color, breaks = breaks, 
+        labels_col = xlabel, show_rownames = T, filename = "heatmap.png")
+    
+}
+
 plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
     
     assignInNamespace(x = "draw_matrix", value = draw_matrix2, ns = asNamespace("pheatmap"))
@@ -76,13 +113,13 @@ plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, clust
     xpos <- c(half[1], (idx[-22] + half))
     xlabel[xpos] <- 1:22
     
-    data <- object@control.normalized[[cnv.scale]]
+    data <- log2(object@control.normalized.noiseRemoved[[cnv.scale]])
     
     if (only_soi) 
         data <- data[, !(colnames(data) %in% object@control.sample.ids)]
     
     pheatmap(t(data), cluster_cols = F, cluster_rows = T, gaps_col = idx, color = color, breaks = breaks, 
-        labels_col = xlabel, show_rownames = T, filename = "test.png")
+        labels_col = xlabel, show_rownames = T, filename = "heatmap.png")
     
 }
 
@@ -622,9 +659,7 @@ plotSCellCNVTree <- function(finalChrMat, sampleName, path = "C:\\Users\\aharman
     colnames(m) <- rownames(finalChrMat)
     rownames(m) <- rownames(finalChrMat)
     tree <- Rfitch(na.omit(m), global = T, path = path, outgroup = T)
-    
-    
-    
+  
     pdf(fileName)
     X <- as.matrix(finalChrMat)[, which(apply(finalChrMat, 2, sum) != 0)]
     plot(tree, x.lim = 40, align.tip = TRUE, adj = 1, cex = 0.2)

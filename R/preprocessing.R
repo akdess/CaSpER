@@ -25,8 +25,6 @@
 #'
 #' @param log.transformed indicates if the data log2 transformed or not. (default:TRUE)
 #' 
-#' @param centered.threshold
-#' 
 #' @param window.length window length used for median filtering (default: 50)
 #' 
 #' @param length.iterations increase in window length at each scale iteration (default: 50)
@@ -42,32 +40,61 @@
 #' @export
 #'
 CreateCasperObject <- function(raw.data, annotation, control.sample.ids, cytoband, loh.name.mapping, cnv.scale, loh.scale, 
-    method, loh, project = "casperProject", sequencing.type, expr.cutoff = 4.5, display.progress = TRUE, log.transformed = TRUE, 
-    centered.threshold = 3, window.length = 50, length.iterations = 50, vis.bound = 2, noise.thr = 0.3, genomeVersion = "hg19", 
+    method, loh, project = "casperProject", matrix.type="raw", sequencing.type, expr.cutoff = 0.1, log.transformed = TRUE, 
+    window.length = 50, length.iterations = 50,  genomeVersion = "hg19", filter= "median",
     ...) {
     
     object <- new(Class = "casper", raw.data = raw.data, loh = loh, annotation = annotation, sequencing.type = sequencing.type, 
         control.sample.ids = control.sample.ids, project.name = project,  cytoband = cytoband, loh.name.mapping = loh.name.mapping, 
-        cnv.scale = cnv.scale, loh.scale = loh.scale, method = method, window.length = window.length, length.iterations = length.iterations, 
-        vis.bound = vis.bound, noise.thr = noise.thr, genomeVersion = genomeVersion)
-    # filter cells on number of genes detected modifies the raw.data slot as well now
-    if (!log.transformed) {
-        object@raw.data <- log2(object@raw.data + 1)
-    }
+        cnv.scale = cnv.scale, loh.scale = loh.scale, matrix.type = matrix.type, method = method, window.length = window.length, length.iterations = length.iterations, 
+         genomeVersion = genomeVersion, filter = filter)
+
     object.raw.data <- object@raw.data
+    if(matrix.type == "normalized") {
+         gene.average <- rowMeans(((2^object.raw.data) - 1))
+    }
+    if(matrix.type == "raw") {
+         gene.average <- rowMeans(object.raw.data)
+    }
+
+    indices <- which(gene.average < expr.cutoff)
     
-    gene.average <- log2(rowMeans((((2^object.raw.data) - 1) * 10), na.rm = TRUE) + 1)
-    genes.use <- gene.average > expr.cutoff
-    object@data <- object.raw.data[genes.use, ]
-    object.data <- object@data
-    object@annotation.filt <- object@annotation[genes.use, ]
+    if(length(indices) >0) {
+        object@data <- object.raw.data[-1 * indices, , drop=FALSE]
+        object.data <- object@data
+        object@annotation.filt <- object@annotation[-1 * indices, , drop=FALSE]
+    } else {
+        object@data <- object.raw.data
+        object.data <- object@data
+        object@annotation.filt <- object@annotation
+
+    }
     
-    centered.data <- object.data - rowMeans(object.data, na.rm = TRUE)
-    centered.data[centered.data > centered.threshold] <- centered.threshold
-    centered.data[centered.data < (-centered.threshold)] <- (-centered.threshold)
-    centered.data <- centered.data - rowMeans(centered.data, na.rm = TRUE)
-    object@centered.data <- centered.data
-    
+   if(is.null( object.data) || nrow( object.data) < 1 || ncol( object.data) < 1){  stop("Error, data has no rows or columns") }
+
+    # processing steps adapted from infercnv R package
+    if(matrix.type == "raw") {
+        cs <- colSums(object.data)
+        object.data <- sweep(object.data, STATS=cs, MARGIN=2, FUN="/")
+        normalize_factor <-  median(cs)
+        object.data  <- object.data * normalize_factor
+        object.data <- log2(object.data + 1)
+        #centered.data <-  t(scale(t(object.data)))
+    }
+
+    centered.data <-  t(apply(t(object.data), 2, function(y) (y - mean(y)) / sd(y) ^ as.logical(sd(y))))
+
+    object@centered.data <- AverageReference(data = centered.data, ref_ids = object@control.sample.ids)
+    lower_bound <- mean(apply(object@centered.data, 2,
+                              function(x) quantile(x, na.rm=TRUE)[[1]]))
+    upper_bound <- mean(apply(object@centered.data, 2,
+                              function(x) quantile(x, na.rm=TRUE)[[5]]))
+
+    threshold = mean(abs(c(lower_bound, upper_bound)))
+
+    object@centered.data[object@centered.data > threshold] <- threshold
+    object@centered.data[object@centered.data < (-1 * threshold)] <- -1 * threshold
+
     object <- ProcessData(object)
     
     return(object)
@@ -86,17 +113,18 @@ CreateCasperObject <- function(raw.data, annotation, control.sample.ids, cytoban
 #' 
 ProcessData <- function(object) {
     
-    object <- PerformMedianFilterByChr(object, window.length = object@window.length, length.iterations = object@length.iterations)
+    if (object@filter=="median")   object <- PerformMedianFilterByChr(object)
+    if (object@filter=="mean")   object <- PerformMeanFilterByChr(object)
     
     object <- CenterSmooth(object)
     
-    object <- ControlNormalize(object, vis.bound = object@vis.bound, noise.thr = object@noise.thr)
-    # parameters.to.store <- as.list(x = environment(), all = TRUE)[names(formals('CreateCasperObject'))]
-    # parameters.to.store$raw.data <- NULL
+    object <- ControlNormalize(object)
+
     return(object)
 }
 
-#' @title PerformMedianFilter()
+# adapted from infercnv R package
+#' @title PerformMeanFilter()
 #'
 #' @description Recusive iterative median filtering is applied to whole genome 
 #'
@@ -112,24 +140,81 @@ ProcessData <- function(object) {
 
 PerformMedianFilter <- function(object, window.length = 50, length.iterations = 50) {
     
-    median.filtered.data <- list()
+    filtered.data <- list()
     
     for (i in 1:object@cnv.scale) {
         if (i == 1) {
-            median.filtered.data[[i]] <- apply(object@centered.data, 2, function(x) round(filter(MedianFilter(window.length + 
+            filtered.data[[i]] <- apply(object@centered.data, 2, function(x) round(filter(MedianFilter(window.length + 
                 1), x), digits = 2))
-            rownames(median.filtered.data[[i]]) <- rownames(object@centered.data)
+            rownames(filtered.data[[i]]) <- rownames(object@centered.data)
             window.length <- window.length + length.iterations
         } else {
-            median.filtered.data[[i]] <- apply(median.filtered.data[[i - 1]], 2, function(x) round(filter(MedianFilter(window.length + 
+            filtered.data[[i]] <- apply(filtered.data[[i - 1]], 2, function(x) round(filter(MedianFilter(window.length + 
                 1), x), digits = 2))
-            rownames(median.filtered.data[[i]]) <- rownames(object@centered.data)
+            rownames(filtered.data[[i]]) <- rownames(object@centered.data)
             window.length <- window.length + length.iterations
         }
     }
-    object@median.filtered.data <- median.filtered.data
+    object@filtered.data <- filtered.data
     return(object)
 }
+
+
+#' @title PerformMeanFilterByChr()
+#'
+#' @description Recusive iterative median filtering is applied for each chromosome
+#'
+#' @param object casper object
+#'
+#' @return object
+#'
+#' @export
+#'
+ 
+PerformMeanFilterByChr <- function(object) {
+    
+    window.length = object@window.length 
+    length.iterations = object@length.iterations
+
+    filtered.data <- list()
+    gene_chr_listing = object@annotation.filt[, "Chr"]
+    chrs = unlist(unique(gene_chr_listing))
+
+           
+    for (i in 1:object@cnv.scale) {
+          message("Performing Mean filtering...")
+          message(paste0("Scale:", i, "..."))
+          if (i == 1) { 
+            filtered.data[[i]] <- object@centered.data
+            for (chr in chrs) {
+                chr_genes_indices <-  which(gene_chr_listing == chr)
+             
+                chr_data <-   filtered.data[[i]] [chr_genes_indices, , drop=FALSE]
+                if (nrow(chr_data) > 1) {
+                    chr_data <-  apply(chr_data, 2, caTools::runmean, k=window.length + 1)
+                    filtered.data[[i]][chr_genes_indices, ] <- chr_data
+                }
+            }
+            window.length <- window.length + length.iterations
+        } else {
+        
+        filtered.data[[i]] <- filtered.data[[i-1]] 
+            for (chr in chrs) {
+                chr_genes_indices <-  which(gene_chr_listing == chr)
+                chr_data <-  filtered.data[[i]][chr_genes_indices, , drop=FALSE]
+                    if (nrow(chr_data) > 1) {
+                        chr_data <- apply(chr_data, 2, caTools::runmean, k=window.length + 1)
+                        filtered.data[[i]][chr_genes_indices, ] <- chr_data
+                    }
+            }
+            window.length <- window.length + length.iterations
+        } 
+    }
+
+    object@filtered.data <- filtered.data
+    return(object)
+}
+
 
 #' @title PerformMedianFilterByChr()
 #'
@@ -137,56 +222,56 @@ PerformMedianFilter <- function(object, window.length = 50, length.iterations = 
 #'
 #' @param object casper object
 #'
-#' @param window.length window length used for median filtering
-#' 
-#' @param length.iterations increase in window length at each scale iteration 
-#'
 #' @return object
 #'
 #' @export
 #'
  
-PerformMedianFilterByChr <- function(object, window.length = 50, length.iterations = 50) {
+PerformMedianFilterByChr <- function(object) {
     
-    median.filtered.data <- list()
-    
+    window.length = object@window.length 
+    length.iterations = object@length.iterations
+
+    filtered.data <- list()
+    gene_chr_listing = object@annotation.filt[, "Chr"]
+    chrs = unlist(unique(gene_chr_listing))
+
+           
     for (i in 1:object@cnv.scale) {
-        if (i == 1) {
-            median.filtered.data[[i]] <- apply(object@centered.data, 2, function(x) {
-                dataByChr <- split(x, object@annotation.filt[, "Chr"])[unique(object@annotation.filt[, "Chr"])]
-                dataAll <- c()
-                sapply(dataByChr, function(y) {
-                  r <- as.vector(y)
-                  f <- round(filter(MedianFilter(window.length + 1), r), digits = 2)
-                  dataAll <<- c(dataAll, f)
-                  # return(dataAll)
-                })
-                return(dataAll)
-            })
-            
-            rownames(median.filtered.data[[i]]) <- rownames(object@centered.data)
+          message("Performing Median Filtering...")
+          message(paste0("Scale:", i, "..."))
+          if (i == 1) { 
+            filtered.data[[i]] <- object@centered.data
+            for (chr in chrs) {
+                chr_genes_indices <-  which(gene_chr_listing == chr)
+             
+                chr_data <-   filtered.data[[i]] [chr_genes_indices, , drop=FALSE]
+                if (nrow(chr_data) > 1) {
+                    chr_data <- apply(chr_data, 2, function(x) round(filter(MedianFilter(window.length + 1), x), digits = 2))
+                        
+                    filtered.data[[i]][chr_genes_indices, ] <- chr_data
+                }
+            }
             window.length <- window.length + length.iterations
         } else {
-            median.filtered.data[[i]] <- apply(median.filtered.data[[i - 1]], 2, function(x) {
-                dataByChr <- split(x, object@annotation.filt[, "Chr"])[unique(object@annotation.filt[, "Chr"])]
-                dataAll <- c()
-                sapply(dataByChr, function(y) {
-                  r <- as.vector(y)
-                  f <- round(filter(MedianFilter(window.length + 1), r), digits = 2)
-                  dataAll <<- c(dataAll, f)
-                  # return(dataAll)
-                })
-                return(dataAll)
-            })
-            rownames(median.filtered.data[[i]]) <- rownames(object@centered.data)
+        
+        filtered.data[[i]] <- filtered.data[[i-1]] 
+            for (chr in chrs) {
+                chr_genes_indices <-  which(gene_chr_listing == chr)
+                chr_data <-  filtered.data[[i]][chr_genes_indices, , drop=FALSE]
+                    if (nrow(chr_data) > 1) {
+                        chr_data <- apply(chr_data, 2, function(x) round(filter(MedianFilter(window.length + 1), x), digits = 2))
+                        filtered.data[[i]][chr_genes_indices, ] <- chr_data
+                    }
+            }
             window.length <- window.length + length.iterations
-        }
+        } 
     }
-    object@median.filtered.data <- median.filtered.data
+    object@filtered.data <- filtered.data
     return(object)
 }
 
-
+ # processing steps adapted from infercnv R package
 #' @title CenterSmooth()
 #'
 #' @description Cell centric expression centering is performed. For each cell (or sample), we compute the mid-point of the expression level then we subtract the mid-point expression from the expression levels of all the genes for the corresponding cell
@@ -199,15 +284,17 @@ PerformMedianFilterByChr <- function(object, window.length = 50, length.iteratio
 #'
 #' 
 CenterSmooth <- function(object) {
+
     object@center.smoothed.data <- list()#' 
     for (i in 1:object@cnv.scale) {
-        row_median <- apply(object@median.filtered.data[[i]], 2, median)
-        object@center.smoothed.data[[i]] <- t(apply(object@median.filtered.data[[i]], 1, "-", row_median))
+        row_median <- apply(object@filtered.data[[i]], 2, function(x) { median(x, na.rm=TRUE) } )
+        object@center.smoothed.data[[i]] <- t(apply(object@filtered.data[[i]], 1, "-", row_median))
     }
     return(object)
     
 }
 
+ # processing steps adapted from infercnv R package
 #' @title ControlNormalize()
 #'
 #' @description  The control normalization is performed by subtracting reference expression values from the tumor expression values.
@@ -219,19 +306,36 @@ CenterSmooth <- function(object) {
 #' @export
 #'
 #'
-ControlNormalize <- function(object, vis.bound, noise.thr) {
+ControlNormalize <- function(object) {
     object@control.normalized <- list()
-    object@control.normalized.visbound.noiseRemoved <- list()
-    object@control.normalized.visbound <- list()
+    object@control.normalized.noiseRemoved <- list()
     
     for (i in 1:object@cnv.scale) {
         object@control.normalized[[i]] <- AverageReference(data = object@center.smoothed.data[[i]], ref_ids = object@control.sample.ids)
-        data <- object@control.normalized[[i]]
-        data[data < (-vis.bound)] <- (-vis.bound)
-        data[data > vis.bound] <- vis.bound
-        object@control.normalized.visbound[[i]] <- data
-        data[abs(data) < noise.thr] <- 0
-        object@control.normalized.visbound.noiseRemoved[[i]] <- data
+        
+        data <- 2^object@control.normalized[[i]]
+
+        # adapted from infercnv R package
+        lower_bound <- mean(apply(data, 2,
+                                  function(x) quantile(x, na.rm=TRUE)[[1]]))
+        upper_bound <- mean(apply(data, 2,
+                                  function(x) quantile(x, na.rm=TRUE)[[5]]))
+
+                                            # apply bounds
+        data[data < lower_bound] <- lower_bound
+        data[data > upper_bound] <- upper_bound
+
+        
+        vals = data[, colnames(data) %in% object@control.sample.ids]
+        mean_ref_vals = mean(as.matrix(vals), na.rm=T)
+        mean_ref_sd <- mean(apply(as.matrix(vals), 2, function(x) sd(x, na.rm = T))) * 1.5
+        upper_bound = mean_ref_vals + mean_ref_sd
+        lower_bound = mean_ref_vals - mean_ref_sd
+        data[data > lower_bound & data < 
+          data] = mean_ref_vals
+
+
+        object@control.normalized.noiseRemoved[[i]] <- data
         
     }
     
@@ -252,7 +356,7 @@ ControlNormalize <- function(object, vis.bound, noise.thr) {
 #'
 #'
 AverageReference <- function(data, ref_ids) {
-    average_reference_obs <- data[, ref_ids, drop = FALSE]
+    average_reference_obs <- data[, colnames(data) %in% ref_ids, drop = FALSE]
     grp_average <- rowMeans(average_reference_obs, na.rm = TRUE)   
     data <- data - grp_average
     return(data)

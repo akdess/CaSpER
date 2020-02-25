@@ -45,15 +45,24 @@ loh.name.mapping <- data.frame (loh.name= "MM135" , sample.name=colnames(log.ge)
 
 object <- CreateCasperObject(raw.data=log.ge,loh.name.mapping=loh.name.mapping, sequencing.type="single-cell", 
 cnv.scale=3, loh.scale=3, 
-expr.cutoff=0.1, 
+expr.cutoff=0.1, filter="median", matrix.type="normalized",
 annotation=annotation, method="iterative", loh=loh, 
 control.sample.ids=control, cytoband=cytoband)
+
+
+pdf("MM135.Distrubution.pdf")
+plot(density(as.vector(object@control.normalized[[3]])))
+plot(density(log2(object@control.normalized.noiseRemoved[[3]]+1)))
+dev.off()
 
 ## runCaSpER
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 
 ## summarize large scale events 
 finalChrMat <- extractLargeScaleEvents (final.objects, thr=0.75) 
+
+obj <- final.objects[[9]]
+plotHeatmap10x(object=obj, fileName="heatmap.png",cnv.scale= 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T)
 
 #### VISUALIZATION 
 chrMat <- finalChrMat

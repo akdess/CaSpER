@@ -20,7 +20,7 @@
 #' 
 #' @slot loh  original baf signal 
 #' 
-#' @slot median.filtered.data  median filtered expression signal 
+#' @slot filtered.data  median filtered expression signal 
 #' 
 #' @slot loh.median.filtered.data  median filtered baf signal 
 #' 
@@ -30,9 +30,7 @@
 #' 
 #' @slot control.normalized  control normalization is performed by subtracting reference expression values from the tumor expression values. 
 #' 
-#' @slot control.normalized.visbound   control normalized data is thresholded in order to perform better visualization.
-#' 
-#' @slot control.normalized.visbound.noiseRemoved  noise is removed from control normalized and thresholded data.
+#' @slot control.normalized.noiseRemoved  noise is removed from control normalized and thresholded data.
 #' 
 #' @slot large.scale.cnv.events large scale CNV events identified by CaSpER
 #' 
@@ -78,12 +76,12 @@
 #' @aliases casper-class
 #' @exportClass casper
 
-casper <- methods::setClass("casper", slots = c(raw.data = "ANY", data = "ANY", median.filtered.data = "ANY", loh.median.filtered.data = "ANY", 
-    centered.data = "ANY", center.smoothed.data = "ANY", control.normalized = "ANY", control.normalized.visbound = "ANY", control.normalized.visbound.noiseRemoved = "ANY", 
+casper <- methods::setClass("casper", slots = c(raw.data = "ANY", data = "ANY", filtered.data = "ANY", loh.median.filtered.data = "ANY", 
+    centered.data = "ANY", matrix.type="ANY", center.smoothed.data = "ANY", control.normalized = "ANY", control.normalized.noiseRemoved = "ANY", 
     large.scale.cnv.events = "ANY", segments = "ANY", cytoband = "ANY", annotation = "ANY", annotation.filt = "ANY", control.sample.ids = "character", 
-    project.name = "character", genomeVersion = "ANY", hmmparam = "ANY", plotorder = "ANY", vis.bound = "ANY", 
-    noise.thr = "ANY", loh.name.mapping = "ANY", sequencing.type = "ANY", cnv.scale = "ANY", loh.scale = "ANY", method = "ANY", 
-    loh.shift.thr = "ANY", window.length = "ANY", length.iterations = "ANY", loh = "ANY"))
+    project.name = "character", genomeVersion = "ANY", hmmparam = "ANY", plotorder = "ANY",
+	 loh.name.mapping = "ANY", sequencing.type = "ANY", cnv.scale = "ANY", loh.scale = "ANY", method = "ANY", 
+    loh.shift.thr = "ANY", window.length = "ANY", length.iterations = "ANY", loh = "ANY", filter= "ANY"))
 
 setMethod(f = "show", signature = "casper", definition = function(object) {
     cat("An object of class", class(object), "in project", object@project.name, "\n", nrow(x = object@raw.data), "genes across", 

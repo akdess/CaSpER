@@ -30,7 +30,7 @@ data <- data[match( annotation$Gene,rownames(data)), ]
 
 object <- CreateCasperObject(raw.data=data, loh.name.mapping=loh.name.mapping, 
     sequencing.type="bulk", cnv.scale=3, loh.scale=3,method="iterative",
-              annotation=annotation, loh=loh, 
+              annotation=annotation, loh=loh, matrix.type="normalized", expr.cutoff=1,
               control.sample.ids=control.sample.ids, cytoband=cytoband)
 
 ## runCaSpER
