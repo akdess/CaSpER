@@ -101,7 +101,7 @@ mkdir test; samtools view SRR1295366.sorted.bam | ./bin/BAFExtract -generate_com
 
 **2. Normalized gene expression data** 
 
-The expression values should be normalized using  TPM or FPKM. Below is an example normalized gene expression input :
+The expression values can be normalized using  TPM or FPKM or raw. Below is an example normalized gene expression input :
 ```{r, include=FALSE}
 library(knitr)
 ```
@@ -125,6 +125,24 @@ data(hg19_cytoband)
 kable(cytoband[1:5, ])
 ```
 
+HG38 cytoband information can be genrated using the flooing commands: 
+
+``` r
+http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/cytoBand.txt.gz
+```
+```{r, eval=T}
+cytoband <- read.delim("cytoBand.txt", header=F)
+cytoband$V4 <-substring(cytoband$V4, 1, 1)
+start <-  do.call(rbind, lapply(split(cytoband$V2, paste0(cytoband$V1, cytoband$V4)), min))
+end <- do.call(rbind, lapply(split(cytoband$V3, paste0(cytoband$V1, cytoband$V4)), max))
+cytoband <- data.frame(V1=gsub("p", "", gsub("q", "",  rownames(start))), V2=start, V3=end, V4=rownames(start), stringsAsFactors=F)
+cytoband$V4[grep("q", cytoband$V4)] <- "q"
+cytoband$V4[grep("p", cytoband$V4)] <- "p"
+cytoband <- cytoband [ as.vector(sapply(c(1:22, "X"), function(x)  which(cytoband$V1 %in% x))), ]
+rownames(cytoband) <- NULL
+```
+
+
 Centromere information can be downloaded from UCSC. 
 ``` r
 #curl -s "http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/cytoBand.txt.gz" | gunzip -c | grep acen | head
@@ -136,7 +154,7 @@ Annotation data which contains the positions of each gene along each chromosome 
 
 
 ```{r, eval=F}
-annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(yale_meningioma$data), ishg19=T, centromere)
+annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(yale_meningioma$data), ishg19=T, centromere, host="uswest.ensembl.org")
 ```
 
 ```{r, include=FALSE}
@@ -164,8 +182,8 @@ Casper object is created using following functions
 
 ```{r, eval=F}
 object <- CreateCasperObject(raw.data=data,loh.name.mapping=loh.name.mapping, sequencing.type="bulk", 
-  cnv.scale=3, loh.scale=3,
-  annotation=annotation, method="iterative", loh=loh, 
+  cnv.scale=3, loh.scale=3, matrix.type="normalized", expr.cutoff=4.5,
+  annotation=annotation, method="iterative", loh=loh, filter="median",  
   control.sample.ids=control.sample.ids, cytoband=cytoband)
 ```
 
