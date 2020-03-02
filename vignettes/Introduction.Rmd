@@ -24,7 +24,7 @@ CaSpER is publicly available from https://github.com/akdess/CaSpER
 This vignette shows the basic steps for running CaSpER.
 
 ## Installing CaSpER
-CaSpER is developed under R version 3.4.3.  
+CaSpER is developed under R version 3.4.3 and updated for 3.6.2
 
 You can install CaSpER R package using the following R commands:
 
@@ -39,7 +39,7 @@ biocLite(c('biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
 
 ```
 
-For 3.6.1
+For 3.6.2
 
 ``` r
 BiocManager::install(c('biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
@@ -132,7 +132,9 @@ data(hg19_cytoband)
 kable(cytoband[1:5, ])
 ```
 
-HG38 cytoband information can be generated using the following commands: 
+HG38 cytoband information can be generated using the following commands:
+
+First cytoband information can be downloaded from UCSC. 
 
 ``` r
 http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/cytoBand.txt.gz
@@ -140,12 +142,13 @@ http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/cytoBand.txt.gz
 
 ```{r, eval=F}
 cytoband <- read.delim("cytoBand.txt", header=F)
-cytoband$V4 <-substring(cytoband$V4, 1, 1)
-start <-  do.call(rbind, lapply(split(cytoband$V2, paste0(cytoband$V1, cytoband$V4)), min))
+cytoband <- data.frame(V1=gsub("chr", "", cytoband[,1]), V2=cytoband[,2], V3=cytoband[,3], V4=substring(cytoband$V4, 1, 1), stringsAsFactors=F)
+start <- do.call(rbind, lapply(split(cytoband$V2, paste0(cytoband$V1, cytoband$V4)), min))
 end <- do.call(rbind, lapply(split(cytoband$V3, paste0(cytoband$V1, cytoband$V4)), max))
-cytoband <- data.frame(V1=gsub("p", "", gsub("q", "",  rownames(start))), V2=start, V3=end, V4=rownames(start), stringsAsFactors=F)
-cytoband$V4 <-substring(cytoband$V4, 1, 1)
-cytoband <- cytoband [ as.vector(sapply(c(1:22, "X"), function(x)  which(cytoband$V1 %in% x))), ]
+cytoband <- data.frame(V1=gsub("p", "", gsub("q", "", rownames(start))), V2=start, V3=end, V4=rownames(start), stringsAsFactors=F)
+cytoband <- cytoband [as.vector(unlist(sapply(c(1:22, "X"), function(x) which(cytoband$V1 %in% x)))), ]
+cytoband$V4[grep("q", cytoband$V4)] <- "q"
+cytoband$V4[grep("p", cytoband$V4)] <- "p"
 rownames(cytoband) <- NULL
 ```
 
@@ -160,8 +163,7 @@ Annotation data which contains the positions of each gene along each chromosome 
 
 
 
-```{r, eval=F}
-annotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(yale_meningioma$data), ishg19=T, centromere, host="uswest.ensembl.org")
+```{rannotation <- generateAnnotation(id_type="ensembl_gene_id", genes=rownames(yale_meningioma$data), ishg19=T, centromere, host="uswest.ensembl.org")
 ```
 
 ```{r, include=FALSE}
