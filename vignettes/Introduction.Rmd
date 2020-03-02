@@ -35,7 +35,14 @@ You may need to install libcurl-devel, libopenssl-devel openssl-devel and libxml
 ex: sudo yum -y install libxml2-devel libcurl-devel libopenssl-devel openssl-devel
 
 source("https://bioconductor.org/biocLite.R")
-biocLite(c('HMMcopy', 'GenomeGraphs', 'biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
+biocLite(c('biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
+
+```
+
+For 3.6.1
+
+``` r
+BiocManager::install(c('biomaRt', 'limma', 'GO.db', 'org.Hs.eg.db', 'GOstats'))
 ```
 
 Install CaSpER R package:
@@ -125,19 +132,19 @@ data(hg19_cytoband)
 kable(cytoband[1:5, ])
 ```
 
-HG38 cytoband information can be genrated using the flooing commands: 
+HG38 cytoband information can be generated using the following commands: 
 
 ``` r
 http://hgdownload.cse.ucsc.edu/goldenPath/hg38/database/cytoBand.txt.gz
 ```
-```{r, eval=T}
+
+```{r, eval=F}
 cytoband <- read.delim("cytoBand.txt", header=F)
 cytoband$V4 <-substring(cytoband$V4, 1, 1)
 start <-  do.call(rbind, lapply(split(cytoband$V2, paste0(cytoband$V1, cytoband$V4)), min))
 end <- do.call(rbind, lapply(split(cytoband$V3, paste0(cytoband$V1, cytoband$V4)), max))
 cytoband <- data.frame(V1=gsub("p", "", gsub("q", "",  rownames(start))), V2=start, V3=end, V4=rownames(start), stringsAsFactors=F)
-cytoband$V4[grep("q", cytoband$V4)] <- "q"
-cytoband$V4[grep("p", cytoband$V4)] <- "p"
+cytoband$V4 <-substring(cytoband$V4, 1, 1)
 cytoband <- cytoband [ as.vector(sapply(c(1:22, "X"), function(x)  which(cytoband$V1 %in% x))), ]
 rownames(cytoband) <- NULL
 ```
@@ -212,9 +219,6 @@ After creating the casper object we perform HMM on all scales of expression sign
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 ```
 
-```{r include=FALSE}
-load("final.objects.yale.mn.rda")
-```
 
 **3. Harmonization and Summarization of CNV calls from multiple scales and from multiple pairwise comparison of BAF and Expression Signals**
 
