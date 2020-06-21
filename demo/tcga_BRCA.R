@@ -35,12 +35,6 @@ object <- CreateCasperObject(raw.data=data, loh.name.mapping=loh.name.mapping,
               control.sample.ids=control.sample.ids, cytoband=cytoband)
 
 
-
-
-pdf("TCGA_GBM.Distrubution.pdf")
-plot(density(as.vector(object@control.normalized[[3]])))
-plot(density(log2(object@control.normalized.noiseRemoved[[3]]+1)))
-dev.off()
 ## runCaSpER
 ## this might take some time
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
@@ -73,73 +67,10 @@ colnames(all.summary) [2:4] <- c("Chromosome", "Start",   "End")
 rna <-  GRanges(seqnames = Rle(gsub("q", "", gsub("p", "", all.summary$Chromosome))), 
     IRanges(all.summary$Start, all.summary$End))   
 ann.gr <- makeGRangesFromDataFrame(final.objects[[1]]@annotation.filt, keep.extra.columns = TRUE, seqnames.field="Chr")
-hits <- findOverlaps(geno.rna, ann.gr)
-genes <- splitByOverlap(ann.gr, geno.rna, "GeneSymbol")
+hits <- findOverlaps(rna, ann.gr)
+genes <- splitByOverlap(ann.gr, rna, "GeneSymbol")
 genes.ann <- lapply(genes, function(x) x[!(x=="")])
 all.genes <- unique(final.objects[[1]]@annotation.filt[,2])
 all.samples <- unique(as.character(final.objects[[1]]@segments$ID))
 rna.matrix <- gene.matrix(seg=all.summary, all.genes=all.genes, all.samples=all.samples, genes.ann=genes.ann)
 
-## genotyping array gene based summary
-segments <- yale_meningioma$segments
-segments$type<- segments$Type_Corrected
-geno.gr <-  GRanges(seqnames = Rle(gsub("q", "", gsub("p", "", segments$chr))), IRanges(segments$start, segments$end))   
-hits <- findOverlaps(geno.gr, ann.gr)
-genes <- splitByOverlap(ann.gr, geno.gr, "GeneSymbol")
-genes.ann <- lapply(genes, function(x) x[!(x=="")])
-gt.matrix <- gene.matrix(seg=segments, all.samples=all.samples, all.genes=all.genes, genes.ann=genes.ann)
-
-## calculate TPR and FPR using genotyping array as gold standard
-calcROC(chrMat=rna.matrix, chrMat2=gt.matrix)
-
-
-#### Visualization 
-
-## plot large scale events 
-plotLargeScaleEvent (object=obj, fileName="large.scale.events.pdf") 
-## plot large scale events using event summary matrix 1: amplification, -1:deletion, 0: neutral
-plotLargeScaleEvent2 (finalChrMat, fileName="large.scale.events.summarized.pdf") 
-## plot BAF deviation for each sample in seperate pages 
-plotBAFInSeperatePages (loh =obj@loh.median.filtered.data, folderName="LOHPlotsSeperate") 
-## plot gene expression and BAF signal for one sample in one plot
-plotGEAndBAFOneSample (object=obj, cnv.scale=3, loh.scale=3, sample= "TCGA-02-0047-01A")
-
-
-#### Gene Based Accuracy 
-
-
-
-  print(k)
-  segments$size <- segments$End - segments$Start
-  colnames(segments)[1] <- c("ID")
-  segments$type <-  rep("neut", nrow(segments))
-  segments$type[segments$Segment_Mean>segmentMean[k]] <- "Gain"
-  segments$type[segments$Segment_Mean< (-segmentMean[k])] <- "Loss"
-
-  geno.gr <-  GRanges(seqnames = Rle(gsub("q", "", gsub("p", "", segments$Chromosome))), IRanges(segments$Start, segments$End))   
-  
-  hits <- findOverlaps(geno.gr, ann.gr)
-  genes <- splitByOverlap(ann.gr, geno.gr, "GeneSymbol")
-  genes.ann <- lapply(genes, function(x) x[!(x=="")])
-
-  gt.matrix <- gene.matrix(seg=segments, all.samples=all.samples, all.genes=all.genes, genes.ann=genes.ann)
- 
-  thr.results <- list()
-  thr.s <- 1:9
-  for (thr in 1:length(thr.s) ){
-
-    all.summary.loss.f <- all.summary.loss[all.summary.loss$count>=thr.s[thr], ]
-    all.summary.gain.f <- all.summary.gain[all.summary.gain$count>=thr.s[thr], ]
-    all.summary <- rbind(all.summary.loss.f,all.summary.gain.f)
-    colnames(all.summary) [2:4] <- c("Chromosome", "Start",   "End")
-
-    geno.rna <-  GRanges(seqnames = Rle(gsub("q", "", gsub("p", "", all.summary$Chromosome))), 
-      IRanges(all.summary$Start, all.summary$End))   
-  
-    hits <- findOverlaps(geno.rna, ann.gr)
-    genes <- splitByOverlap(ann.gr, geno.rna, "GeneSymbol")
-    genes.ann <- lapply(genes, function(x) x[!(x=="")])
-
-    rna.matrix <- gene.matrix(seg=all.summary, all.genes=all.genes, all.samples=all.samples, genes.ann=genes.ann)
-
-    thr.results[[thr]]<- calcROC (chrMat=rna.matrix, chrMat2=gt.matrix) 
