@@ -8,7 +8,7 @@ Description: Identification, visualization and integrative analysis of CNV event
 Encoding: UTF-8
 LazyData: true
 LinkingTo: Rcpp
-Depends: Rcpp, signal, pheatmap, RColorBrewer, IRanges, grid, ggplot2, reshape, mclust,  ggpubr, scales, gridExtra, igraph, intergraph, ggnetwork, ape, biomaRt, limma, GO.db, org.Hs.eg.db, GOstats
+Depends: Rcpp, signal, pheatmap, RColorBrewer, IRanges, grid, ggplot2, reshape, mclust,  ggpubr, scales, gridExtra, igraph, intergraph, ggnetwork, ape, biomaRt, limma, GO.db, org.Hs.eg.db, GOstats, GenomicRanges
 RoxygenNote: 6.1.1
 Suggests: knitr,
     rmarkdown
