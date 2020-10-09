@@ -1,7 +1,7 @@
 Package: CaSpER
 Type: Package
 Title: Identify large-scale CNV events from single cell or bulk RNA-Seq data
-Version: 0.1.0
+Version: 0.2.0
 Author: Akdes Serin Harmanci, Arif O. Harmanci
 Maintainer: Akdes Serin Harmanci <akdes.harmanci@uth.tmc.edu> 
 Description: Identification, visualization and integrative analysis of CNV events in multiscale resolution using single-cell or bulk RNA sequencing data
