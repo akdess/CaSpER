@@ -76,7 +76,7 @@
 #' @aliases casper-class
 #' @exportClass casper
 
-casper <- methods::setClass("casper", slots = c(raw.data = "ANY", data = "ANY", filtered.data = "ANY", loh.median.filtered.data = "ANY", 
+casper <- methods::setClass("casper", slots = c(raw.data = "ANY", data = "ANY", filtered.data = "ANY", loh.median.filtered.data = "ANY", control.normalized.visbound.noiseRemoved="ANY",
     centered.data = "ANY", matrix.type="ANY", center.smoothed.data = "ANY", control.normalized = "ANY", control.normalized.noiseRemoved = "ANY", 
     large.scale.cnv.events = "ANY", segments = "ANY", cytoband = "ANY", annotation = "ANY", annotation.filt = "ANY", control.sample.ids = "character", 
     project.name = "character", genomeVersion = "ANY", hmmparam = "ANY", plotorder = "ANY",
