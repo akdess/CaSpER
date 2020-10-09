@@ -1,6 +1,6 @@
 CaSpER is published in Nature Communications: https://www.nature.com/articles/s41467-019-13779-x 
 
-CaSpER documentation is [here: RMD file](https://rpubs.com/akdes/578955).
+CaSpER documentation is [here: RMD file](https://rpubs.com/akdes/673120).
  
 BAFExtract code is available [here](https://github.com/akdess/BAFExtract).
 
