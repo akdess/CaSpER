@@ -346,7 +346,6 @@ mergeScalesAndGenerateFinalEventSummary <- function(final.objects) {
     return(list(mergeScalesAmp = mergeScalesAmp, mergeScalesDel = mergeScalesDel))
 }
 
-setwd("C:\\Users\\aharmanci\\Google Drive\\uthealth\\Casper_Issue_MM")
 # load CreateCasperObject object 
 load("object.rda")
 library(GenomicRanges)
