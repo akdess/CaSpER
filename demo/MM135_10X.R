@@ -18,12 +18,12 @@ mm135 <- ScaleData(mm135)
 
 mm135 <- RunPCA(mm135, features = VariableFeatures(object = mm135),npcs = 100)
 mm135 <- RunTSNE(mm135, dims.use = 1:10)
-DimPlot(pbmc, reduction = "tsne")
-FeaturePlot(pbmc, features = c("SDC1", "CD38"))
+DimPlot(mm135, reduction = "tsne")
+FeaturePlot(mm135, features = c("SDC1", "CD38"))
 
 mm135 <- FindNeighbors(mm135, dims = 1:10)
 mm135 <- FindClusters(mm135, resolution = 0.5)
-DimPlot(pbmc, reduction = "tsne", label=T)
+DimPlot(mm135, reduction = "tsne", label=T)
 
 log.ge <- as.matrix(mm135@assays$RNA@data)
 control <- names(Idents(mm135) )[Idents(mm135) %in% c(2,7)]
