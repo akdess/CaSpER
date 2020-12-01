@@ -95,7 +95,7 @@ plotHeatmap10x <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cl
         data <- data[, !(colnames(data) %in% object@control.sample.ids)]
     
     pheatmap(t(data), cluster_cols = F, cluster_rows = T, gaps_col = idx, color = color, breaks = breaks, 
-        labels_col = xlabel, show_rownames = T, filename = "heatmap.png")
+        labels_col = xlabel, show_rownames = T, filename = fileName)
     
 }
 
@@ -119,7 +119,7 @@ plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, clust
         data <- data[, !(colnames(data) %in% object@control.sample.ids)]
     
     pheatmap(t(data), cluster_cols = F, cluster_rows = T, gaps_col = idx, color = color, breaks = breaks, 
-        labels_col = xlabel, show_rownames = T, filename = "heatmap.png")
+        labels_col = xlabel, show_rownames = T, filename = fileName)
     
 }
 
