@@ -50,7 +50,7 @@ genoMat <- genoMat[match(common, rownames(genoMat)), ]
 calcROC(chrMat=finalChrMat, chrMat2=genoMat)
 
 ## segment based summary    
-gamma <- 6
+gamma <- 7
 all.segments <- do.call(rbind, lapply(final.objects, function(x) x@segments))
 segment.summary <- extractSegmentSummary (final.objects)
 loss <- segment.summary$all.summary.loss
