@@ -239,9 +239,10 @@ generateAnnotation <- function(id_type = "ensembl_gene_id", genes, ishg19, centr
     } else {
         mart <- useDataset("hsapiens_gene_ensembl", useEnsembl(biomart = "ensembl", host = host))
     }
-    
-    G_list <- getBM(filters = id_type, attributes = c(id_type, "hgnc_symbol", "chromosome_name", "start_position", "end_position", 
-        "band"), values = genes, mart = mart)
+    G_list <- getBM(filters = id_type, attributes = c(id_type, 
+        "hgnc_symbol", "chromosome_name", "start_position", 
+        "end_position", "band"), values = genes, 
+        mart = mart, useCache=F)
     common <- intersect(genes, G_list[, id_type])
     ord <- match(common, G_list[, id_type])
     annotation <- G_list[ord, ]
