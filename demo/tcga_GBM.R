@@ -72,14 +72,9 @@ all.samples <- unique(as.character(final.objects[[1]]@segments$ID))
 rna.matrix <- gene.matrix(seg=all.summary, all.genes=all.genes, all.samples=all.samples, genes.ann=genes.ann)
 
 ## genotyping array gene based summary
-segments <- yale_meningioma$segments
-segments$type<- segments$Type_Corrected
-geno.gr <-  GRanges(seqnames = Rle(gsub("q", "", gsub("p", "", segments$chr))), IRanges(segments$start, segments$end))   
-hits <- findOverlaps(geno.gr, ann.gr)
-genes <- splitByOverlap(ann.gr, geno.gr, "GeneSymbol")
-genes.ann <- lapply(genes, function(x) x[!(x=="")])
-gt.matrix <- gene.matrix(seg=segments, all.samples=all.samples, all.genes=all.genes, genes.ann=genes.ann)
-
+## download https://www.dropbox.com/s/68rn36gpx6plew7/gbm.gt.matrix.rda?dl=0             
+load("gbm.gt.matrix.rda")
+                    
 ## calculate TPR and FPR using genotyping array as gold standard
 calcROC(chrMat=rna.matrix, chrMat2=gt.matrix)
 
