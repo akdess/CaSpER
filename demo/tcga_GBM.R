@@ -37,6 +37,8 @@ object <- CreateCasperObject(raw.data=data, loh.name.mapping=loh.name.mapping,
 ## this might take some time
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 
+## download https://www.dropbox.com/s/348a9qjg3ddyajj/tcga.gbm.final.objects.updated.rda?dl=0             
+load("tcga.gbm.final.objects.updated.rda")
 ## plot median filtered gene expression matrix
 obj <- final.objects[[9]]
 plotHeatmap(object, fileName="heatmap.png", cnv.scale= 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T)
