@@ -39,6 +39,8 @@ object <- CreateCasperObject(raw.data=data, loh.name.mapping=loh.name.mapping,
 ## this might take some time
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 
+# download final.objects from 
+load("tcga.brca.final.objects.updated.rda")
 ## plot median filtered gene expression matrix
 obj <- final.objects[[9]]
 plotHeatmap(object, fileName="heatmap.png", cnv.scale= 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T)
@@ -53,7 +55,7 @@ genoMat <- genoMat[match(common, rownames(genoMat)), ]
 calcROC(chrMat=finalChrMat, chrMat2=genoMat)
 
 ## segment based summary    
-gamma <- 6
+gamma <- 7
 all.segments <- do.call(rbind, lapply(final.objects, function(x) x@segments))
 segment.summary <- extractSegmentSummary (final.objects)
 loss <- segment.summary$all.summary.loss
@@ -74,3 +76,10 @@ all.genes <- unique(final.objects[[1]]@annotation.filt[,2])
 all.samples <- unique(as.character(final.objects[[1]]@segments$ID))
 rna.matrix <- gene.matrix(seg=all.summary, all.genes=all.genes, all.samples=all.samples, genes.ann=genes.ann)
 
+#download gt matrix form https://www.dropbox.com/s/9xl95r2v45ezjpj/gt.matrix.brca.rda?dl=0
+load("gt.matrix.brca.rda")
+                    
+## calculate TPR and FPR using genotyping array as gold standard
+calcROC(chrMat=rna.matrix, chrMat2=gt.matrix)
+
+                    
