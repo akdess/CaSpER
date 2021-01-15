@@ -39,7 +39,7 @@ object <- CreateCasperObject(raw.data=data, loh.name.mapping=loh.name.mapping,
 ## this might take some time
 final.objects <- runCaSpER(object, removeCentromere=T, cytoband=cytoband, method="iterative")
 
-# download final.objects from 
+# download final.objects from https://www.dropbox.com/s/i2i7th1602zyttw/tcga.brca.final.objects.updated.rda?dl=0
 load("tcga.brca.final.objects.updated.rda")
 ## plot median filtered gene expression matrix
 obj <- final.objects[[9]]
