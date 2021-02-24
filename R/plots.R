@@ -62,7 +62,7 @@ draw_matrix2 <- function(matrix, border_color, gaps_rows, gaps_cols, fmat, fonts
 #' @export
 #'
 #'
-plotHeatmap10x <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
+plotHeatmap10x <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T, ...) {
     
     assignInNamespace(x = "draw_matrix", value = draw_matrix2, ns = asNamespace("pheatmap"))
     assignInNamespace(x = "draw_colnames", value = "draw_colnames_45", ns = asNamespace("pheatmap"))
@@ -94,12 +94,12 @@ plotHeatmap10x <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cl
     if (only_soi) 
         data <- data[, !(colnames(data) %in% object@control.sample.ids)]
     
-    pheatmap(t(data), cluster_cols = F, cluster_rows = T, gaps_col = idx, color = color, breaks = breaks, 
-        labels_col = xlabel, show_rownames = T, filename = "heatmap.png")
+    pheatmap(t(data), cluster_cols = cluster_cols, cluster_rows = cluster_rows, gaps_col = idx, color = color, breaks = breaks, 
+        labels_col = xlabel, show_rownames = show_rownames, filename = fileName, ...)
     
 }
 
-plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T) {
+plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, cluster_rows = T, show_rownames = T, only_soi = T,...) {
     
     assignInNamespace(x = "draw_matrix", value = draw_matrix2, ns = asNamespace("pheatmap"))
     assignInNamespace(x = "draw_colnames", value = "draw_colnames_45", ns = asNamespace("pheatmap"))
@@ -118,8 +118,8 @@ plotHeatmap <- function(object, fileName, cnv.scale = 3, cluster_cols = F, clust
     if (only_soi) 
         data <- data[, !(colnames(data) %in% object@control.sample.ids)]
     
-    pheatmap(t(data), cluster_cols = F, cluster_rows = T, gaps_col = idx, color = color, breaks = breaks, 
-        labels_col = xlabel, show_rownames = T, filename = "heatmap.png")
+    pheatmap(t(data), cluster_cols = cluster_cols, cluster_rows = cluster_rows, gaps_col = idx, color = color, breaks = breaks, 
+        labels_col = xlabel, show_rownames = show_rownames, filename = fileName, ...)
     
 }
 
