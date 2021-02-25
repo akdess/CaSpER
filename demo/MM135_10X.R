@@ -27,7 +27,6 @@ DimPlot(mm135, reduction = "tsne", label=T)
 
 log.ge <- as.matrix(mm135@assays$RNA@data)
 control <- names(Idents(mm135) )[Idents(mm135) %in% c(2,7)]
-mm <- names(Idents(mm135) )[Idents(mm135) %in% c(0, 1, 3, 4)]
 
 genes <- rownames(log.ge)
 annotation <- generateAnnotation(id_type="hgnc_symbol", genes=genes, centromere=centromere, ishg19 = T)
