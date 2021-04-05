@@ -373,7 +373,7 @@ plotGEAndBAFOneSample <- function(object, cnv.scale, loh.scale, sample, n = 50, 
     samples <- names(object@loh.median.filtered.data)
     plot_list = list()
     
-    to.plot <- rbind(data.frame(variable = "expr.original", value = log2(centered.control.normalized[, sample]), object@annotation.filt[, 
+    to.plot <- rbind(data.frame(variable = "expr.original", value = (centered.control.normalized[, sample]), object@annotation.filt[, 
         c("Chr", "Position", "cytoband")]), data.frame(variable = paste0("expr.scale", cnv.scale), value = log2(object@control.normalized.noiseRemoved[[cnv.scale]][, 
         sample]), object@annotation.filt[, c("Chr", "Position", "cytoband")]))
     # to.plot <- melt(data, measure.vars = colnames(data)[1:2])
@@ -453,7 +453,7 @@ plotGEAllSamples <- function(object, fileName = fileName, cnv.scale) {
     samples <- names(object@loh.median.filtered.data)
     plot_list = list()
     for (i in 1:length(samples)) {
-        data <- data.frame(original = log2(centered.control.normalized[, samples[i]]), scale = log2(object@control.normalized.noiseRemoved[[cnv.scale]][, 
+        data <- data.frame(original = (centered.control.normalized[, samples[i]]), scale = log2(object@control.normalized.noiseRemoved[[cnv.scale]][, 
             samples[i]]), object@annotation.filt[, c("Chr", "Position", "cytoband")])
         
         
